@@ -7,6 +7,7 @@ import { databaseForUser, type StudyDatabase } from '@/lib/db';
 import { firebaseConfigured, getFirebase } from '@/lib/firebase';
 import { ApiTransport } from '@/lib/api-transport';
 import { SyncService, type SyncStatus } from '@/lib/sync';
+import { normalizeApiUrl } from '@/lib/api/client';
 
 interface StudyContext {
   database: StudyDatabase | null; user: User | null; authReady: boolean;
@@ -55,21 +56,31 @@ export function StudyProvider({ children }: { children: ReactNode }) {
       return;
     }
     let active = true;
-    const next = new SyncService(database, new ApiTransport(user, apiUrl),
-      value => { if (active) setStatus(value); });
+    let next: SyncService;
+    try {
+      const baseUrl = normalizeApiUrl(apiUrl, process.env.NODE_ENV === 'production');
+      next = new SyncService(database, new ApiTransport(user, baseUrl),
+        value => { if (active) setStatus(value); });
+    } catch (error) {
+      setService(null);
+      setStatus({ phase: 'error', pending: 0, message: error instanceof Error ? error.message : 'Cấu hình API không hợp lệ.' });
+      return;
+    }
     setService(next);
     void next.sync();
     // Sync định kỳ và khi quay lại app; pagehide chỉ best effort, hàng đợi Dexie bảo đảm retry.
     const timer = window.setInterval(() => { void next.sync(); }, 60_000);
-    const visibility = () => { void next.sync(); };
-    window.addEventListener('online', visibility);
+    const visibility = () => { if (document.visibilityState === 'visible') void next.sync(); };
+    const onlineSync = () => { void next.sync(); };
+    const flush = () => { void next.sync(); };
+    window.addEventListener('online', onlineSync);
     document.addEventListener('visibilitychange', visibility);
-    window.addEventListener('pagehide', visibility);
+    window.addEventListener('pagehide', flush);
     return () => {
       active = false; next.stop(); window.clearInterval(timer);
-      window.removeEventListener('online', visibility);
+      window.removeEventListener('online', onlineSync);
       document.removeEventListener('visibilitychange', visibility);
-      window.removeEventListener('pagehide', visibility);
+      window.removeEventListener('pagehide', flush);
     };
   }, [database, user]);
   useEffect(() => {
