@@ -1,0 +1,684 @@
+[
+  {
+    "id": "一",
+    "pinyin": [
+      "yī"
+    ],
+    "hanViet": [
+      "nhất"
+    ],
+    "meaning": [
+      "một"
+    ],
+    "strokes": 0,
+    "components": [],
+    "hsk": 1,
+    "freq": 1,
+    "mnemonic": "Một nét ngang, một khởi đầu.",
+    "examples": [],
+    "source": [
+      "Bộ khởi đầu biên soạn"
+    ],
+    "starterWord": {
+      "simplified": "一天",
+      "meaning": [
+        "một ngày"
+      ]
+    }
+  },
+  {
+    "id": "二",
+    "pinyin": [
+      "èr"
+    ],
+    "hanViet": [
+      "nhị"
+    ],
+    "meaning": [
+      "hai"
+    ],
+    "strokes": 0,
+    "components": [
+      "一"
+    ],
+    "hsk": 1,
+    "freq": 2,
+    "mnemonic": "Hai nét ngang như hai tầng của một ngôi nhà.",
+    "examples": [],
+    "source": [
+      "Bộ khởi đầu biên soạn"
+    ],
+    "starterWord": {
+      "simplified": "二月",
+      "meaning": [
+        "tháng hai"
+      ]
+    }
+  },
+  {
+    "id": "三",
+    "pinyin": [
+      "sān"
+    ],
+    "hanViet": [
+      "tam"
+    ],
+    "meaning": [
+      "ba"
+    ],
+    "strokes": 0,
+    "components": [
+      "一"
+    ],
+    "hsk": 1,
+    "freq": 3,
+    "mnemonic": "Ba nét ngang: đếm từ trên xuống, một, hai, ba.",
+    "examples": [],
+    "source": [
+      "Bộ khởi đầu biên soạn"
+    ],
+    "starterWord": {
+      "simplified": "三天",
+      "meaning": [
+        "ba ngày"
+      ]
+    }
+  },
+  {
+    "id": "人",
+    "pinyin": [
+      "rén"
+    ],
+    "hanViet": [
+      "nhân"
+    ],
+    "meaning": [
+      "người"
+    ],
+    "strokes": 0,
+    "components": [],
+    "hsk": 1,
+    "freq": 4,
+    "mnemonic": "Hai nét như một người đang bước đi.",
+    "examples": [],
+    "source": [
+      "Bộ khởi đầu biên soạn"
+    ],
+    "starterWord": {
+      "simplified": "一个人",
+      "meaning": [
+        "một người"
+      ]
+    }
+  },
+  {
+    "id": "大",
+    "pinyin": [
+      "dà"
+    ],
+    "hanViet": [
+      "đại"
+    ],
+    "meaning": [
+      "lớn"
+    ],
+    "strokes": 0,
+    "components": [
+      "人"
+    ],
+    "hsk": 1,
+    "freq": 5,
+    "mnemonic": "Người dang rộng hai tay để diễn tả điều thật lớn.",
+    "examples": [],
+    "source": [
+      "Bộ khởi đầu biên soạn"
+    ],
+    "starterWord": {
+      "simplified": "大山",
+      "meaning": [
+        "núi lớn"
+      ]
+    }
+  },
+  {
+    "id": "小",
+    "pinyin": [
+      "xiǎo"
+    ],
+    "hanViet": [
+      "tiểu"
+    ],
+    "meaning": [
+      "nhỏ"
+    ],
+    "strokes": 0,
+    "components": [],
+    "hsk": 1,
+    "freq": 6,
+    "mnemonic": "Những chấm nhỏ hai bên một nét thẳng.",
+    "examples": [],
+    "source": [
+      "Bộ khởi đầu biên soạn"
+    ],
+    "starterWord": {
+      "simplified": "小雨",
+      "meaning": [
+        "mưa nhỏ"
+      ]
+    }
+  },
+  {
+    "id": "日",
+    "pinyin": [
+      "rì"
+    ],
+    "hanViet": [
+      "nhật"
+    ],
+    "meaning": [
+      "mặt trời",
+      "ngày"
+    ],
+    "strokes": 0,
+    "components": [
+      "口"
+    ],
+    "hsk": 1,
+    "freq": 7,
+    "mnemonic": "Một ô cửa có đường ngang, gợi hình mặt trời cổ xưa.",
+    "examples": [],
+    "source": [
+      "Bộ khởi đầu biên soạn"
+    ],
+    "starterWord": {
+      "simplified": "日子",
+      "meaning": [
+        "ngày tháng"
+      ]
+    }
+  },
+  {
+    "id": "月",
+    "pinyin": [
+      "yuè"
+    ],
+    "hanViet": [
+      "nguyệt"
+    ],
+    "meaning": [
+      "mặt trăng",
+      "tháng"
+    ],
+    "strokes": 0,
+    "components": [],
+    "hsk": 1,
+    "freq": 8,
+    "mnemonic": "Hai nét bên trong như vệt sáng trên trăng.",
+    "examples": [],
+    "source": [
+      "Bộ khởi đầu biên soạn"
+    ],
+    "starterWord": {
+      "simplified": "月亮",
+      "meaning": [
+        "mặt trăng"
+      ]
+    }
+  },
+  {
+    "id": "明",
+    "pinyin": [
+      "míng"
+    ],
+    "hanViet": [
+      "minh"
+    ],
+    "meaning": [
+      "sáng",
+      "rõ ràng"
+    ],
+    "strokes": 0,
+    "components": [
+      "日",
+      "月"
+    ],
+    "hsk": 2,
+    "freq": 9,
+    "mnemonic": "Mặt trời 日 và mặt trăng 月 cùng soi, mọi thứ sáng rõ.",
+    "examples": [],
+    "source": [
+      "Bộ khởi đầu biên soạn"
+    ],
+    "starterWord": {
+      "simplified": "明天",
+      "meaning": [
+        "ngày mai"
+      ]
+    }
+  },
+  {
+    "id": "木",
+    "pinyin": [
+      "mù"
+    ],
+    "hanViet": [
+      "mộc"
+    ],
+    "meaning": [
+      "cây",
+      "gỗ"
+    ],
+    "strokes": 0,
+    "components": [],
+    "freq": 10,
+    "mnemonic": "Một thân cây, cành dang ra và rễ vươn xuống.",
+    "examples": [],
+    "source": [
+      "Bộ khởi đầu biên soạn"
+    ],
+    "starterWord": {
+      "simplified": "木头",
+      "meaning": [
+        "gỗ"
+      ]
+    }
+  },
+  {
+    "id": "林",
+    "pinyin": [
+      "lín"
+    ],
+    "hanViet": [
+      "lâm"
+    ],
+    "meaning": [
+      "rừng thưa"
+    ],
+    "strokes": 0,
+    "components": [
+      "木",
+      "木"
+    ],
+    "freq": 11,
+    "mnemonic": "Hai cây 木 đứng cạnh nhau thành một khu rừng.",
+    "examples": [],
+    "source": [
+      "Bộ khởi đầu biên soạn"
+    ],
+    "starterWord": {
+      "simplified": "树林",
+      "meaning": [
+        "rừng cây"
+      ]
+    }
+  },
+  {
+    "id": "森",
+    "pinyin": [
+      "sēn"
+    ],
+    "hanViet": [
+      "sâm"
+    ],
+    "meaning": [
+      "rừng rậm"
+    ],
+    "strokes": 0,
+    "components": [
+      "木",
+      "木",
+      "木"
+    ],
+    "freq": 12,
+    "mnemonic": "Ba cây 木 chồng lên nhau, rừng trở nên rậm rạp.",
+    "examples": [],
+    "source": [
+      "Bộ khởi đầu biên soạn"
+    ],
+    "starterWord": {
+      "simplified": "森林",
+      "meaning": [
+        "rừng rậm"
+      ]
+    }
+  },
+  {
+    "id": "口",
+    "pinyin": [
+      "kǒu"
+    ],
+    "hanViet": [
+      "khẩu"
+    ],
+    "meaning": [
+      "miệng"
+    ],
+    "strokes": 0,
+    "components": [],
+    "freq": 13,
+    "mnemonic": "Hình vuông gợi một chiếc miệng đang mở.",
+    "examples": [],
+    "source": [
+      "Bộ khởi đầu biên soạn"
+    ],
+    "starterWord": {
+      "simplified": "人口",
+      "meaning": [
+        "dân số"
+      ]
+    }
+  },
+  {
+    "id": "中",
+    "pinyin": [
+      "zhōng"
+    ],
+    "hanViet": [
+      "trung"
+    ],
+    "meaning": [
+      "giữa",
+      "trung tâm"
+    ],
+    "strokes": 0,
+    "components": [
+      "口"
+    ],
+    "hsk": 1,
+    "freq": 14,
+    "mnemonic": "Một nét đi xuyên chính giữa ô vuông.",
+    "examples": [],
+    "source": [
+      "Bộ khởi đầu biên soạn"
+    ],
+    "starterWord": {
+      "simplified": "中国",
+      "meaning": [
+        "Trung Quốc"
+      ]
+    }
+  },
+  {
+    "id": "山",
+    "pinyin": [
+      "shān"
+    ],
+    "hanViet": [
+      "sơn"
+    ],
+    "meaning": [
+      "núi"
+    ],
+    "strokes": 0,
+    "components": [],
+    "freq": 15,
+    "mnemonic": "Ba đỉnh núi nhô lên từ một chân núi.",
+    "examples": [],
+    "source": [
+      "Bộ khởi đầu biên soạn"
+    ],
+    "starterWord": {
+      "simplified": "山水",
+      "meaning": [
+        "núi và nước"
+      ]
+    }
+  },
+  {
+    "id": "水",
+    "pinyin": [
+      "shuǐ"
+    ],
+    "hanViet": [
+      "thủy"
+    ],
+    "meaning": [
+      "nước"
+    ],
+    "strokes": 0,
+    "components": [],
+    "hsk": 1,
+    "freq": 16,
+    "mnemonic": "Dòng nước ở giữa và những giọt tỏa ra hai bên.",
+    "examples": [],
+    "source": [
+      "Bộ khởi đầu biên soạn"
+    ],
+    "starterWord": {
+      "simplified": "水果",
+      "meaning": [
+        "trái cây"
+      ]
+    }
+  },
+  {
+    "id": "火",
+    "pinyin": [
+      "huǒ"
+    ],
+    "hanViet": [
+      "hỏa"
+    ],
+    "meaning": [
+      "lửa"
+    ],
+    "strokes": 0,
+    "components": [],
+    "freq": 17,
+    "mnemonic": "Những tia lửa tung lên quanh ngọn lửa lớn.",
+    "examples": [],
+    "source": [
+      "Bộ khởi đầu biên soạn"
+    ],
+    "starterWord": {
+      "simplified": "火山",
+      "meaning": [
+        "núi lửa"
+      ]
+    }
+  },
+  {
+    "id": "好",
+    "pinyin": [
+      "hǎo"
+    ],
+    "hanViet": [
+      "hảo"
+    ],
+    "meaning": [
+      "tốt",
+      "hay"
+    ],
+    "strokes": 0,
+    "components": [
+      "女",
+      "子"
+    ],
+    "hsk": 1,
+    "freq": 18,
+    "mnemonic": "Ghép 女 và 子. Tưởng tượng một người mẹ và đứa con cùng vui.",
+    "examples": [],
+    "source": [
+      "Bộ khởi đầu biên soạn"
+    ],
+    "starterWord": {
+      "simplified": "你好",
+      "meaning": [
+        "xin chào"
+      ]
+    }
+  },
+  {
+    "id": "女",
+    "pinyin": [
+      "nǚ"
+    ],
+    "hanViet": [
+      "nữ"
+    ],
+    "meaning": [
+      "nữ",
+      "phụ nữ"
+    ],
+    "strokes": 0,
+    "components": [],
+    "hsk": 1,
+    "freq": 19,
+    "mnemonic": "Hình người với hai tay đặt trước thân.",
+    "examples": [],
+    "source": [
+      "Bộ khởi đầu biên soạn"
+    ],
+    "starterWord": {
+      "simplified": "女人",
+      "meaning": [
+        "phụ nữ"
+      ]
+    }
+  },
+  {
+    "id": "子",
+    "pinyin": [
+      "zǐ"
+    ],
+    "hanViet": [
+      "tử"
+    ],
+    "meaning": [
+      "con",
+      "đứa trẻ"
+    ],
+    "strokes": 0,
+    "components": [],
+    "hsk": 1,
+    "freq": 20,
+    "mnemonic": "Một đứa trẻ dang hai tay chờ được ôm.",
+    "examples": [],
+    "source": [
+      "Bộ khởi đầu biên soạn"
+    ],
+    "starterWord": {
+      "simplified": "孩子",
+      "meaning": [
+        "đứa trẻ"
+      ]
+    }
+  },
+  {
+    "id": "学",
+    "pinyin": [
+      "xué"
+    ],
+    "hanViet": [
+      "học"
+    ],
+    "meaning": [
+      "học",
+      "học tập"
+    ],
+    "strokes": 0,
+    "components": [
+      "子"
+    ],
+    "hsk": 1,
+    "freq": 21,
+    "mnemonic": "Một đứa trẻ 子 dưới mái trường đang học.",
+    "examples": [],
+    "source": [
+      "Bộ khởi đầu biên soạn"
+    ],
+    "starterWord": {
+      "simplified": "学生",
+      "meaning": [
+        "học sinh"
+      ]
+    }
+  },
+  {
+    "id": "生",
+    "pinyin": [
+      "shēng"
+    ],
+    "hanViet": [
+      "sinh"
+    ],
+    "meaning": [
+      "sinh",
+      "sống"
+    ],
+    "strokes": 0,
+    "components": [],
+    "hsk": 1,
+    "freq": 22,
+    "mnemonic": "Một mầm cây vươn lên từ mặt đất.",
+    "examples": [],
+    "source": [
+      "Bộ khởi đầu biên soạn"
+    ],
+    "starterWord": {
+      "simplified": "生活",
+      "meaning": [
+        "cuộc sống"
+      ]
+    }
+  },
+  {
+    "id": "天",
+    "pinyin": [
+      "tiān"
+    ],
+    "hanViet": [
+      "thiên"
+    ],
+    "meaning": [
+      "trời",
+      "ngày"
+    ],
+    "strokes": 0,
+    "components": [
+      "一",
+      "大"
+    ],
+    "hsk": 1,
+    "freq": 23,
+    "mnemonic": "Phía trên người 大 là một nét chỉ bầu trời.",
+    "examples": [],
+    "source": [
+      "Bộ khởi đầu biên soạn"
+    ],
+    "starterWord": {
+      "simplified": "今天",
+      "meaning": [
+        "hôm nay"
+      ]
+    }
+  },
+  {
+    "id": "田",
+    "pinyin": [
+      "tián"
+    ],
+    "hanViet": [
+      "điền"
+    ],
+    "meaning": [
+      "ruộng"
+    ],
+    "strokes": 0,
+    "components": [
+      "口"
+    ],
+    "freq": 24,
+    "mnemonic": "Một thửa ruộng được chia thành bốn ô.",
+    "examples": [],
+    "source": [
+      "Bộ khởi đầu biên soạn"
+    ],
+    "starterWord": {
+      "simplified": "田地",
+      "meaning": [
+        "ruộng đất"
+      ]
+    }
+  }
+]

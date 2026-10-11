@@ -1,0 +1,4 @@
+# Giữ line ending ổn định giữa Windows và CI Linux.
+* text=auto eol=lf
+# License bên thứ ba được giữ nguyên nội dung gốc, kể cả khoảng trắng cuối dòng.
+data/licenses/*.txt whitespace=-blank-at-eol

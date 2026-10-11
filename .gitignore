@@ -1,0 +1,12 @@
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+.env*
+!.env.example
+
+.local/
+*-debug.log
+
+# Từ điển public được sinh từ corpus có version và package mẫu nét khi build.
+public/data/
