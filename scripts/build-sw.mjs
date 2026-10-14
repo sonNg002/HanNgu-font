@@ -12,7 +12,7 @@ const assets = (await files('out')).filter(file => /\.(js|css|json|html|txt|svg)
 const hash = createHash('sha256');
 for (const asset of assets.sort()) hash.update(await readFile(asset));
 const version = hash.digest('hex').slice(0, 16);
-const urls = [...new Set(['/', '/browse/', ...assets.map(file => '/' + path.relative('out', file).replaceAll('\\', '/'))])];
+const urls = [...new Set(['/', '/browse/', '/progress/', ...assets.map(file => '/' + path.relative('out', file).replaceAll('\\', '/'))])];
 // SW cache đúng một phiên bản build; không cache Firebase/token hoặc request bên ngoài origin.
 await writeFile('out/sw.js', `
 const CACHE = 'hanzi-${version}';

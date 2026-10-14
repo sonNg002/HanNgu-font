@@ -31,6 +31,8 @@ Hoàn thành bài rồi bấm **Lưu và học chữ tiếp theo**. Kết quả 
 <!-- Bài dở được lưu local theo UID để không lẫn với tiến độ đã hoàn thành hoặc tài khoản khác. -->
 Bước học, câu trả lời, mẹo nhớ và bài viết đã hoàn tất được tự lưu trong IndexedDB; tải lại có thể tiếp tục. Các nét đang viết dở trong quiz cần viết lại. Bộ gợi ý cho phép chọn từng chữ; phần **Tiếp tục từ chỗ dừng** mở lại các bài gần nhất. Bài dở chỉ lưu trên thiết bị hiện tại, còn thẻ đã học/lịch ôn vẫn đồng bộ như trước. Xem [thiết kế cách học](docs/learning-method.md) và [mục tiêu sản phẩm](PRODUCT-BRIEF.md).
 
+Trang **Tiến độ** (`/progress/`) tính từ IndexedDB của tài khoản hiện tại: chuỗi ngày học, tỷ lệ nhớ 90 ngày theo khoảng cách ôn (khoảng 1 ngày/1 tuần/1 tháng) và theo kỹ năng, lượt ôn 30 ngày, thẻ đến hạn 7 ngày tới và chữ hay quên. Lượt ôn cách lần gặp trước dưới 12 giờ không tính vào tỷ lệ nhớ; chữ vững là chữ có độ ổn định FSRS từ 21 ngày ở cả ba kỹ năng. Công thức nằm trong `src/lib/progress.ts`.
+
 ```sh
 npm run dev
 ```

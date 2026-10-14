@@ -183,8 +183,8 @@ footer{display:flex;justify-content:space-between;gap:16px;padding:28px 0;margin
   .dictionary:has(>article:only-child) p{font-size:13px}
   .dictionary .actions button{width:100%;font-size:11px}.dictionary .actions>a{min-height:38px;display:grid;place-items:center;font-size:11px}
   .catalog-controls{padding:18px}.catalog-pagination{gap:9px}
-  .mobile-navigation{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));position:fixed;z-index:30;left:0;right:0;bottom:0;gap:6px;border-top:1px solid #dce4d8;padding:8px max(18px,env(safe-area-inset-right,0px)) max(8px,env(safe-area-inset-bottom,0px));background:#fffffffa;box-shadow:0 -4px 24px #28422506}
-  .mobile-navigation button,.mobile-navigation a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:54px;padding:5px 12px;border:0;border-radius:12px;background:transparent;color:#6a7866;font-size:10px;font-weight:600;text-decoration:none;box-shadow:none}
+  .mobile-navigation{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));position:fixed;z-index:30;left:0;right:0;bottom:0;gap:6px;border-top:1px solid #dce4d8;padding:8px max(18px,env(safe-area-inset-right,0px)) max(8px,env(safe-area-inset-bottom,0px));background:#fffffffa;box-shadow:0 -4px 24px #28422506}
+  .mobile-navigation button,.mobile-navigation a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:54px;padding:5px 4px;border:0;border-radius:12px;background:transparent;color:#6a7866;font-size:10px;font-weight:600;text-decoration:none;box-shadow:none}
   .mobile-navigation .active{background:#edf4e8;color:var(--accent-dark)}
   .mobile-navigation button:active,.mobile-navigation a:active{background:#e4eedb}
   .mobile-navigation span{letter-spacing:.1px}
@@ -198,4 +198,38 @@ footer{display:flex;justify-content:space-between;gap:16px;padding:28px 0;margin
   .lesson-identity h2{font-size:20px}.lesson-identity p{font-size:11px}
   .lesson-topline .eyebrow{font-size:9px;letter-spacing:.7px}.draft-status{font-size:9px}
   .dictionary{gap:8px}.dictionary .panel{padding:12px}
+}
+
+/* Tiến độ: biểu đồ một chuỗi dùng màu chính, lưới mảnh và nhãn chữ giữ màu chữ để dữ liệu là phần nổi bật nhất. */
+.stats>div>small{display:block;margin-top:2px;font-size:11px;line-height:1.35}
+.progress-layout{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:20px;align-items:start}
+.retention-row{margin:14px 0}.retention-row>div{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:13px}
+.retention-row strong{font-size:18px;font-weight:600}.retention-row progress{margin:6px 0 4px}.retention-row small{color:var(--muted)}
+.progress-layout h3{margin-top:24px;padding-top:14px;border-top:1px solid var(--line)}
+.column-chart{margin:18px 0 0}
+.chart-body{display:grid;grid-template-columns:28px minmax(0,1fr);gap:8px}
+.chart-ticks{position:relative;height:160px}.chart-ticks span{position:absolute;right:0;transform:translateY(50%);color:var(--muted);font-size:10px;font-variant-numeric:tabular-nums;line-height:1}
+.chart-plot{position:relative;display:grid;align-items:end;gap:2px;height:160px;border-bottom:1px solid #cfd9cf}
+.chart-grid{position:absolute;left:0;right:0;height:1px;background:var(--line);pointer-events:none}
+.chart-slot{position:relative;z-index:1;display:flex;justify-content:center;align-items:flex-end;height:100%;cursor:default}
+.chart-bar{width:min(24px,72%);min-height:2px;border-radius:4px 4px 0 0;background:var(--accent)}
+.chart-slot.active .chart-bar{background:var(--accent-dark)}.chart-slot.active{background:#2b6b530a;border-radius:4px 4px 0 0}
+.chart-tooltip{position:absolute;z-index:2;top:-8px;transform:translate(-50%,-100%);display:flex;flex-direction:column;padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:var(--white);box-shadow:var(--shadow);font-size:11px;line-height:1.4;white-space:nowrap;pointer-events:none}
+.chart-tooltip.start{transform:translate(-12px,-100%)}.chart-tooltip.end{transform:translate(calc(-100% + 12px),-100%)}
+.chart-tooltip strong{font-size:13px;font-variant-numeric:tabular-nums}.chart-tooltip span{color:var(--muted)}
+.chart-axis{display:grid;gap:2px;margin:6px 0 0 36px;color:var(--muted);font-size:10px}.chart-axis span{display:flex;justify-content:center;white-space:nowrap;overflow:visible;width:0;justify-self:center}
+.chart-table{margin-top:14px;font-size:12px}.chart-table summary{color:var(--accent);cursor:pointer}
+.chart-table table{width:100%;margin-top:8px;border-collapse:collapse}.chart-table th,.chart-table td{padding:5px 8px;border-bottom:1px solid var(--line);text-align:left}
+.chart-table td:last-child,.chart-table th:last-child{text-align:right;font-variant-numeric:tabular-nums}
+.hard-characters{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin:14px 0 0;padding:0;list-style:none}
+.hard-characters li{display:flex;align-items:center;gap:12px;padding:10px 14px;border:1px solid var(--line);border-radius:12px}
+.hard-characters li>span:nth-child(2){flex:1;min-width:0;font-weight:600}.hard-characters small{display:block;overflow:hidden;color:var(--muted);font-weight:400;text-overflow:ellipsis;white-space:nowrap}
+.hard-characters strong{color:var(--warm);font-size:12px;white-space:nowrap}
+@media(max-width:950px){.progress-layout{grid-template-columns:minmax(0,1fr);gap:0}}
+@media(max-width:760px){.chart-ticks,.chart-plot{height:130px}}
+/* Trang chủ ẩn ô thứ tư trên mobile; trang tiến độ cần đủ bốn chỉ số nên xếp lưới 2×2. */
+@media(max-width:760px){
+  .progress-stats{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:12px}
+  .progress-stats>div:last-child{display:block}.progress-stats>div:nth-child(2n){border-right:0}.progress-stats>div:nth-child(3){border-right:1px solid #dce4d5}
+  .progress-stats strong small{display:inline;font-size:11px}
 }

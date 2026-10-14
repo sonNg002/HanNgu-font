@@ -175,7 +175,7 @@ export function LearningApp() {
     <header className="topbar"><a href="/" className="brand"><span className="brand-mark">字</span><span>Hán ngữ<small>Hiểu từng chữ. Nhớ lâu hơn.</small></span></a>
       <a className="mobile-jump" href="#today-plan">Bộ học <span aria-hidden="true">↓</span></a>
       <nav aria-label="Điều hướng chính"><button className={`nav-button ${tab === 'study' ? 'active' : ''}`} aria-pressed={tab === 'study'} onClick={() => setTab('study')}>Học tập</button>
-        <a href="/browse/">Từ điển</a><button className={`nav-button ${tab === 'settings' ? 'active' : ''}`} aria-pressed={tab === 'settings'} onClick={() => setTab('settings')}>Cài đặt</button></nav></header>
+        <a href="/browse/">Từ điển</a><a href="/progress/">Tiến độ</a><button className={`nav-button ${tab === 'settings' ? 'active' : ''}`} aria-pressed={tab === 'settings'} onClick={() => setTab('settings')}>Cài đặt</button></nav></header>
     <div className="intro learning-intro"><div><span className="eyebrow"><span className="desktop-heading">MỖI NGÀY MỘT CHÚT · {authReady ? now.toLocaleDateString('vi-VN') : 'HỌC ĐỀU, NHỚ LÂU'}</span>
       <span className="mobile-heading">{tab === 'settings' ? 'NHỊP HỌC CÁ NHÂN' : `HỌC HÔM NAY · ${groupId === 'all' ? 'TOÀN BỘ CHỮ' : selectedGroup?.title ?? 'CHỮ CƠ BẢN'}`}</span></span>
       <h1><span className="desktop-heading">{tab === 'settings' ? 'Học theo nhịp của bạn.' : 'Hôm nay, thêm một chút hiểu biết.'}</span>
