@@ -21,6 +21,16 @@ Nếu thiếu cấu hình Firebase, ứng dụng vẫn học ở chế độ kh�
 
 ## Chạy local
 
+<!-- Học và ôn có hàng đợi riêng để không chen thẻ tự chấm sau khi học một chữ mới. -->
+Trang chủ tự đề xuất một bộ chữ theo chủ đề hoặc bộ thủ mỗi ngày, dựa trên thứ tự HSK/chữ cơ bản và mục tiêu chữ mới. Bộ gợi ý giữ nguyên trong ngày sau khi lưu chữ; ngày mới loại các chữ đã học và xoay nhóm. Có thể đổi chủ đề, bộ thủ hoặc chọn chữ trong từ điển.
+
+Trong **Học chữ mới**, học theo bốn bước **Hiểu chữ → Nhớ âm → Viết chữ → Dùng trong từ**. Bài học hiện hình chữ, thành phần và mẹo nhớ; kiểm tra Pinyin/Hán Việt; luyện viết theo mẫu rồi tự viết; điền chữ vào từ có sẵn. Pinyin nhận dấu hoặc số thanh, giữ thanh điệu và phân biệt `u`/`ü`. Audio sử dụng giọng Mandarin của thiết bị khi có. Kho biên soạn tiếng Việt được ưu tiên cho người mới.
+
+Hoàn thành bài rồi bấm **Lưu và học chữ tiếp theo**. Kết quả viết được chấm tự động và lưu cùng tiến độ. Thẻ nhận mặt chữ/Hán Việt được giữ cho hoạt động **Ôn tập**; các nút Quên/Khó/Tốt/Dễ chỉ xuất hiện trong phiên ôn trí nhớ. Thẻ đến hạn không chặn học tiếp trong hạn mức ngày.
+
+<!-- Bài dở được lưu local theo UID để không lẫn với tiến độ đã hoàn thành hoặc tài khoản khác. -->
+Bước học, câu trả lời, mẹo nhớ và bài viết đã hoàn tất được tự lưu trong IndexedDB; tải lại có thể tiếp tục. Các nét đang viết dở trong quiz cần viết lại. Bộ gợi ý cho phép chọn từng chữ; phần **Tiếp tục từ chỗ dừng** mở lại các bài gần nhất. Bài dở chỉ lưu trên thiết bị hiện tại, còn thẻ đã học/lịch ôn vẫn đồng bộ như trước. Xem [thiết kế cách học](docs/learning-method.md) và [mục tiêu sản phẩm](PRODUCT-BRIEF.md).
+
 ```sh
 npm run dev
 ```

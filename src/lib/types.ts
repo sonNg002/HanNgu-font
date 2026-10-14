@@ -1,4 +1,4 @@
-import type { WritingAssessment } from './writing';
+import type { WritingAssessment, WritingResult } from './writing';
 import type { Card as FSRSCard, ReviewLog as FSRSLog } from 'ts-fsrs';
 
 export type CardType = 'recognize' | 'write' | 'recall-hv';
@@ -26,6 +26,11 @@ export interface ReviewLog extends SyncFields {
 }
 export interface Settings extends SyncFields { id: 'main'; newPerDay: number; order: 'hsk' | 'freq' }
 export interface SyncMeta { id: string; value: number }
+// Bài dở thuộc kho riêng trên thiết bị, không phải thẻ đã học hoặc dữ liệu đồng bộ.
+export interface LessonDraft {
+  id: string; contentVersion: string; updatedAt: number; step: 0 | 1 | 2 | 3;
+  mnemonic: string; pinyin: string; hanViet: string; writing?: WritingResult; applied: boolean;
+}
 export const CARD_TYPES: CardType[] = ['recognize', 'write', 'recall-hv'];
 export const TYPE_LABELS: Record<CardType, string> = {
   recognize: 'Nhận mặt chữ', write: 'Tập viết', 'recall-hv': 'Nhớ Hán Việt',

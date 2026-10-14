@@ -30,15 +30,14 @@ export async function introduceCharacter(character: Character, mnemonic: string,
       || !Number.isFinite(writing.durationMs) || writing.durationMs < 0) throw new Error('Kết quả không khớp chữ đang học.');
   }
   // Một transaction kiểm hạn mức và tạo đủ ba kỹ năng, kể cả khi hai tab cùng thao tác.
-  await database.transaction('rw', database.cards, database.learned, database.settings, database.reviews, async () => {
+  await database.transaction('rw', database.cards, database.learned, database.settings, database.reviews, database.lessonDrafts, async () => {
     if (await database.learned.get(character.id)) throw new Error('Chữ này đã có trong bộ học.');
     const settings = await database.settings.get('main') ?? DEFAULT_SETTINGS;
     if (await database.learned.where('introducedAt').aboveOrEqual(startOfDay(now)).count() >= settings.newPerDay) {
       throw new Error('Bạn đã đạt mục tiêu chữ mới hôm nay.');
     }
-    if (await database.cards.where('fsrsState.due').belowOrEqual(now).count()) {
-      throw new Error('Hãy hoàn thành các thẻ đến hạn trước khi học chữ mới.');
-    }
+    // Thẻ ôn được giữ nguyên lịch, nhưng không chặn học tiếp chữ khác trong bộ hôm nay.
+    // Giao diện cho học viên mở phiên ôn riêng thay vì ép tự chấm ngay sau mỗi bài viết.
     const sync = changed(undefined, now.getTime());
     await database.learned.add({ id: character.id, introducedAt: now, mnemonic: mnemonic.trim(), updatedAt: sync.updatedAt });
     const cards = CARD_TYPES.map(type => ({
@@ -58,6 +57,8 @@ export async function introduceCharacter(character: Character, mnemonic: string,
       });
     }
     await database.cards.bulkAdd(cards);
+    // Xóa bài dở trong cùng commit, tránh tải lại rồi thấy bài đã học vẫn hiện như chưa hoàn thành.
+    await database.lessonDrafts.delete(character.id);
   });
 }
 export async function gradeCard(

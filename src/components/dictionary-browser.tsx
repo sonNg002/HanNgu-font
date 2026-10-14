@@ -32,7 +32,7 @@ export function DictionaryBrowser({ characters }: { characters: Character[] }) {
     <div className="dictionary">{filtered.slice(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE).map(character => <article className="panel" key={character.id}>
       <div className="hanzi small">{character.id}</div><h2>{character.hanViet.join(' / ') || 'Chưa có âm Việt'}</h2>
       <p>{character.pinyin.join(' / ')}</p><p>{character.meaning.join(' · ')} {character.meaningLanguage === 'en' && <small className="muted">(nghĩa tiếng Anh)</small>}</p>
-      <p className="muted">Bộ {character.radical}{character.radicalVariant !== character.radical ? ` (${character.radicalVariant})` : ''} · {character.strokes} nét{character.hsk ? ` · HSK ${character.hsk}` : ''}</p>
+      <p className="muted">Bộ {character.radical}{character.radicalVariant && character.radicalVariant !== character.radical ? ` (${character.radicalVariant})` : ''} · {character.strokes} nét{character.hsk ? ` · HSK ${character.hsk}` : ''}</p>
       <p className="muted">Thành phần: {character.components.join(' + ') || 'Chữ đơn'}</p>
       {character.readingSource === 'unihan' && <small className="muted">Âm Việt theo Unihan</small>}
       <div className="actions"><button className="secondary" onClick={() => { setPractice(character); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>Luyện viết</button>

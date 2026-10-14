@@ -25,6 +25,7 @@
     "@types/node": "^26.6.5",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
+    "fake-indexeddb": "^6.2.5",
     "hanzi-writer-data": "^2.0.1",
     "serve": "^14.2.6",
     "tsx": "^4.23.15",
