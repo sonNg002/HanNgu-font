@@ -4,7 +4,7 @@ Giao diện Next.js học 3.000 chữ Hán, tra cứu 195 nhóm bộ thủ, luy�
 
 ## Cấu hình
 
-Cần Node.js 22.14+.
+Cần Node.js 24.12+ (Firebase 13 yêu cầu); `.nvmrc` ghi phiên bản dùng cho nvm và CI.
 
 ```sh
 npm ci
@@ -76,4 +76,4 @@ npm run build
 npm run typecheck
 ```
 
-CI chạy các kiểm tra trên Node 22 và tạo artifact `static-website` chỉ chứa `out/`. Các file source/test/config phục vụ phát triển và build; chỉ upload `out/` lên hosting tĩnh. Test bảo vệ retry token, lỗi network/timeout, cursor và điều kiện ack batch.
+CI chạy các kiểm tra trên Node 24 và tạo artifact `static-website` chỉ chứa `out/`. Các file source/test/config phục vụ phát triển và build; chỉ upload `out/` lên hosting tĩnh. Test bảo vệ retry token, lỗi network/timeout, cursor và điều kiện ack batch.
