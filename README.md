@@ -76,4 +76,4 @@ npm run build
 npm run typecheck
 ```
 
-CI chạy các kiểm tra trên Node 24 và tạo artifact `static-website` chỉ chứa `out/`. Các file source/test/config phục vụ phát triển và build; chỉ upload `out/` lên hosting tĩnh. Test bảo vệ retry token, lỗi network/timeout, cursor và điều kiện ack batch.
+CI chạy các kiểm tra trên Node 24 và tạo artifact `static-website` chỉ chứa `out/`. Các file source/test/config phục vụ phát triển và build; chỉ upload `out/` lên hosting tĩnh. Test bảo vệ retry token, lỗi network/timeout, cursor và điều kiện ack batch; `tests/sync.test.ts` kiểm tra pull phân trang, LWW, ack theo revision, chia batch và giữ hàng đợi khi lỗi.
