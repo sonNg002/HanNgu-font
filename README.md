@@ -50,7 +50,7 @@ npm run typecheck
 <!-- Build cần dependency phát triển để sinh từ điển và mẫu nét; chỉ thư mục out được đưa lên hosting. -->
 Cài đầy đủ dependency khi build. `predev` và `build` tự sinh `public/data` từ `data/corpus.json`, `data/starter.json` và `hanzi-writer-data`. Dữ liệu, mẫu nét và license là tài nguyên ứng dụng cần dùng khi deploy. Xem `data/README.md` để biết nguồn dữ liệu và giới hạn chất lượng.
 
-Build xuất website tĩnh vào `out/`. Cấu hình hosting với build command `npm run build` và thư mục publish `out`. Đặt các biến môi trường trước khi chạy build trên hosting.
+Build xuất website tĩnh vào `out/`. Cấu hình hosting với build command `npm run build` và thư mục publish `out`. Đặt các biến môi trường trước khi chạy build trên hosting. `firebase.json` cấu hình Firebase Hosting cho project `hanngu-91a22`; các bước deploy Firebase, API Cloud Run và frontend nằm trong [hướng dẫn deploy](docs/deploy.md).
 
 Xem thử bản đã build bằng:
 
