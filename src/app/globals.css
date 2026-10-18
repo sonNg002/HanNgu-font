@@ -233,3 +233,25 @@ footer{display:flex;justify-content:space-between;gap:16px;padding:28px 0;margin
   .progress-stats>div:last-child{display:block}.progress-stats>div:nth-child(2n){border-right:0}.progress-stats>div:nth-child(3){border-right:1px solid #dce4d5}
   .progress-stats strong small{display:inline;font-size:11px}
 }
+/* Quy ước dùng chung: trạng thái luôn có chữ, focus rõ và vùng chạm tối thiểu 44px. */
+:root{--radius-control:10px;--radius-panel:16px;--space-small:8px;--space-medium:16px;--space-large:24px;--focus-ring:#8a5b24}
+button{border-radius:var(--radius-control)}.panel{border-radius:var(--radius-panel)}
+.skip-link{position:fixed;top:8px;left:16px;z-index:100;background:var(--white);padding:12px 18px;border:2px solid var(--accent);border-radius:var(--radius-control);transform:translateY(-160%)}
+.skip-link:focus{transform:translateY(0)}
+.connection-strip{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:var(--space-small);padding:10px 0;border-bottom:1px solid var(--line);font-size:12px;color:var(--muted)}
+.connection-strip p{display:flex;align-items:center;gap:var(--space-small);margin:0}.connection-strip a{display:inline-flex;align-items:center;min-height:44px}
+.connection-dot{flex:0 0 7px;height:7px;border-radius:50%;background:var(--accent)}.connection-dot.attention{background:var(--warm)}
+.catalog-filter-row{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:var(--space-large)}
+.catalog-controls>button{justify-self:start;margin-bottom:var(--space-medium)}
+.catalog-results-heading{font-size:16px;scroll-margin-top:24px;margin:0 0 var(--space-medium)}
+.catalog-results-heading:focus-visible,#page-content:focus-visible{outline:3px solid var(--focus-ring);outline-offset:4px}
+@media(max-width:760px){.connection-strip{font-size:11px}.connection-strip a{min-height:44px}.catalog-filter-row{gap:12px}.connection-strip{padding:6px 0}}
+@media(max-width:480px){.catalog-filter-row{grid-template-columns:1fr}.connection-strip{gap:0}.catalog-controls{gap:8px}}
+/* Trạng thái tải nằm trong luồng trang, có khoảng trống cho thanh điều hướng mobile. */
+.offline-status{max-width:1180px;margin:0 auto;padding:16px 24px calc(90px + env(safe-area-inset-bottom));color:var(--muted);font-size:14px}.offline-status p{margin:0 0 8px}
+/* Bộ học ngắn giữ cùng hệ màu; checklist sách tách rõ khỏi kết quả ôn đã chấm. */
+.course-modes{margin-bottom:24px}.course-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}.course-card{display:flex;flex-direction:column;margin:0}.course-card .actions{margin-top:auto;padding-top:16px}.course-glyphs{font-family:'KaiTi','SimSun',serif;font-size:32px;letter-spacing:3px}.textbook-lessons summary{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}.textbook-lessons fieldset{border:1px solid var(--line);border-radius:10px;padding:16px}.course-check{display:flex;align-items:center;gap:12px;min-height:44px;margin:4px 0}.course-check input{width:20px;height:20px;min-height:20px;margin:0;flex-shrink:0;accent-color:var(--accent)}
+@media(max-width:1000px){.course-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.topbar nav a,.nav-button{padding-inline:10px}}
+@media(max-width:760px){.mobile-navigation{grid-template-columns:repeat(5,minmax(0,1fr))}.mobile-navigation a,.mobile-navigation button{min-width:0;padding-inline:2px}}
+@media(max-width:540px){.course-grid{grid-template-columns:1fr}}
+.hsk-word-list{list-style:none;padding:0}.hsk-word-list li{display:flex;gap:18px;padding:12px 0;border-bottom:1px solid var(--line)}.hsk-word-list strong{font-size:25px;min-width:70px;overflow-wrap:anywhere}.hsk-word-list span{min-width:0;overflow-wrap:anywhere}.hsk-word-list small{display:block;color:var(--muted)}.hsk-recall{padding:20px;border:1px solid var(--line);border-radius:12px;background:var(--paper)}.hsk-grammar{border-top:1px solid var(--line);padding:12px 0}.hsk-lesson-study{margin:16px 0}.hsk-lesson-study .button-link{margin:10px 0}.textbook-lessons .panel{scroll-margin-top:24px}

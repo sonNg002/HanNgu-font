@@ -9,6 +9,7 @@ export interface Character {
   // Bộ thủ chính dùng để phân nhóm; biến thể giữ riêng để hiện đúng thành phần chữ.
 strokes: number; radical?: string; radicalNumber?: number; radicalVariant?: string;
   readingSource?: 'curated' | 'unihan'; meaningLanguage?: 'vi' | 'en'; components: string[]; decomposition?: string; etymology?: string;
+  meaningTranslation?: 'machine';
   hsk?: number; freq: number; mnemonic: string; examples: Example[]; source: string[];
 }
 export interface Word { id: string; simplified: string; pinyin: string; meaning: string[]; chars: string[] }

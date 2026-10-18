@@ -50,6 +50,7 @@ function CharacterExplanation({ character, characters, mnemonic }: { character: 
     </div></div>
     {character.readingSource === 'unihan' && <small className="muted">Âm Việt theo kho Unihan; có thể gồm cách đọc Hán Nôm.</small>}
     {character.meaningLanguage === 'en' && <p className="muted">Nghĩa của chữ này hiện dùng tiếng Anh trong từ điển.</p>}
+    {character.meaningTranslation === 'machine' && <p className="muted">Nghĩa tiếng Việt được dịch máy; hãy đối chiếu ngữ cảnh khi học.</p>}
     <div className="lesson-association">
       <h3>Nhìn thành phần để nhớ hình</h3>
       {character.components.length > 0 ? <ul className="component-parts">{character.components.map((part, index) => {
@@ -62,9 +63,10 @@ function CharacterExplanation({ character, characters, mnemonic }: { character: 
   </div>;
 }
 
-export function CharacterLesson({ character, characters, words, peers, contentVersion, onPracticeStart, onSaved }: {
+export function CharacterLesson({ character, characters, words, peers, contentVersion, onPracticeStart, onSaved, preferLessonWords = false }: {
   character: Character; characters: Character[]; words: Word[]; peers: Character[]; contentVersion: string;
   onPracticeStart: () => void; onSaved: () => void;
+  preferLessonWords?: boolean;
 }) {
   const { database } = useStudy();
   const [step, setStep] = useState<0 | 1 | 2 | 3>(0);
@@ -82,7 +84,7 @@ export function CharacterLesson({ character, characters, words, peers, contentVe
   const [draftStatus, setDraftStatus] = useState('');
   const [resumed, setResumed] = useState(false);
   const lessonHost = useRef<HTMLElement>(null);
-  const example = lessonExample(character, words);
+  const example = lessonExample(character, words, preferLessonWords);
   const choices = contextChoices(character, peers);
 
   useEffect(() => {

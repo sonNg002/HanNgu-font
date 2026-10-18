@@ -1,5 +1,7 @@
 'use client';
 
+import { AppHeader } from '@/components/app-header';
+
 import { useEffect, useMemo, useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { loadContent } from '@/lib/content';
@@ -78,9 +80,8 @@ export function ProgressDashboard() {
   const overall = summary ? rate(summary.retention) : undefined;
 
   return <main className="shell">
-    <header className="topbar"><a className="brand" href="/"><span className="brand-mark">字</span><span>Hán ngữ<small>Hiểu từng chữ. Nhớ lâu hơn.</small></span></a>
-      <nav aria-label="Điều hướng chính"><a href="/">Học tập</a><a href="/browse/">Từ điển</a><a className="active" aria-current="page" href="/progress/">Tiến độ</a></nav></header>
-    <div className="intro"><span className="eyebrow">TIẾN ĐỘ HỌC</span><h1>Nhìn lại để học đều hơn.</h1>
+    <AppHeader current={'progress'} />
+    <div id="page-content" tabIndex={-1} className="intro"><span className="eyebrow">TIẾN ĐỘ HỌC</span><h1>Nhìn lại để học đều hơn.</h1>
       <p>Tỷ lệ nhớ là số lượt bạn chấm Khó, Tốt hoặc Dễ khi ôn lại sau ít nhất 12 giờ. Số liệu tính trên thiết bị này.</p></div>
     {!authReady || !summary ? <section className="panel" role="status">Đang tính tiến độ…</section>
       : !summary.learned ? <section className="panel"><h2>Chưa có dữ liệu học.</h2><p>Học chữ đầu tiên để bắt đầu theo dõi chuỗi ngày học và tỷ lệ nhớ.</p><a href="/">Học chữ mới →</a></section>

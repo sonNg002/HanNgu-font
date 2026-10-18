@@ -1,4 +1,5 @@
 import Dexie, { type Table } from 'dexie';
+import type { TextbookProgress } from './textbook';
 import type { LearnedCharacter, LessonDraft, ReviewLog, Settings, StudyCard, SyncMeta } from './types';
 
 export class StudyDatabase extends Dexie {
@@ -8,6 +9,7 @@ export class StudyDatabase extends Dexie {
   settings!: Table<Settings, string>;
   syncMeta!: Table<SyncMeta, string>;
   lessonDrafts!: Table<LessonDraft, string>;
+  textbookProgress!: Table<TextbookProgress, string>;
   constructor(name = 'hanzi-learner') {
     super(name);
     this.version(1).stores({
@@ -39,6 +41,8 @@ export class StudyDatabase extends Dexie {
     });
     // Chỉ thêm bảng bài dở; nâng cấp từ v2 giữ nguyên thẻ, lịch ôn và hàng đợi đồng bộ.
     this.version(3).stores({ lessonDrafts: 'id, updatedAt' });
+    // Checklist sách là tự báo cáo, lưu local riêng; không trộn với điểm nhớ hoặc hàng đợi sync thẻ.
+    this.version(4).stores({ textbookProgress: 'id, bookId, updatedAt' });
   }
 }
 export const db = new StudyDatabase();

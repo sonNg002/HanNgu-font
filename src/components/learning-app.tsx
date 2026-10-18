@@ -1,9 +1,13 @@
 'use client';
 
+import { AppHeader } from '@/components/app-header';
+
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { State, type Grade } from 'ts-fsrs';
 import { DEFAULT_SETTINGS } from '@/lib/db';
+import { loadHskContent, hskCharacters, type HskContent } from '@/lib/hsk-content';
+import { memoryDecks } from '@/lib/memory-decks';
 import { dailyRecommendation, studyGroups } from '@/lib/daily-study';
 import { loadContent } from '@/lib/content';
 import { dueCards, gradeCard, orderedCharacters, saveMnemonic, saveSettings, scheduler } from '@/lib/study';
@@ -57,16 +61,25 @@ function SettingsForm({ settings }: { settings: Settings }) {
   const [newPerDay, setNewPerDay] = useState(settings.newPerDay);
   const [order, setOrder] = useState(settings.order);
   const [message, setMessage] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [failed, setFailed] = useState(false);
+  useEffect(() => {
+    // Cập nhật giá trị đồng bộ mà không remount form, để thông báo lưu thành công còn hiển thị.
+    setNewPerDay(settings.newPerDay); setOrder(settings.order);
+  }, [settings.newPerDay, settings.order]);
   async function submit(event: FormEvent) {
-    event.preventDefault(); if (!database) return;
+    event.preventDefault(); if (!database || saving) return;
+    setSaving(true); setFailed(false); setMessage('');
     try { await saveSettings(newPerDay, order, database); setMessage('Đã lưu trên thiết bị.'); }
-    catch (failure) { setMessage(failure instanceof Error ? failure.message : 'Không lưu được cài đặt.'); }
+    catch (failure) { setFailed(true); setMessage(failure instanceof Error ? failure.message : 'Không lưu được cài đặt.'); }
+    finally { setSaving(false); }
   }
   return <section className="panel"><h2>Nhịp học của bạn</h2><form onSubmit={submit}>
     <label>Chữ mới mỗi ngày<input type="number" min={1} max={50} required value={newPerDay} onChange={event => setNewPerDay(Number(event.target.value))} /></label>
     <label>Thứ tự học<select value={order} onChange={event => setOrder(event.target.value as Settings['order'])}>
       <option value="hsk">Theo cấp HSK</option><option value="freq">Chữ cơ bản trước</option></select></label>
-    <button>Lưu cài đặt</button><p role="status">{message}</p>
+    <p className="muted">Bắt đầu với 3–5 chữ mỗi ngày. Bạn có thể thay đổi mục tiêu bất cứ lúc nào.</p>
+    <button disabled={saving}>{saving ? 'Đang lưu…' : 'Lưu nhịp học'}</button><p role={failed ? 'alert' : 'status'} className={failed ? 'error' : 'success'}>{message}</p>
   </form></section>;
 }
 function MnemonicEditor({ character, mnemonic }: { character: Character; mnemonic: string }) {
@@ -85,6 +98,8 @@ function MnemonicEditor({ character, mnemonic }: { character: Character; mnemoni
 export function LearningApp() {
   const { database, authReady, user } = useStudy();
   const [content, setContent] = useState<Content | null>(null);
+  const [hsk, setHsk] = useState<HskContent | null>(null);
+  const [hskError, setHskError] = useState('');
   const [error, setError] = useState('');
   const [now, setNow] = useState(() => new Date());
   const [groupId, setGroupId] = useState('');
@@ -96,19 +111,27 @@ export function LearningApp() {
   useEffect(() => {
     let active = true;
     // Link từ từ điển vẫn mở đúng bộ/chữ; truy cập trang chủ mặc định dùng gợi ý ngày.
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('view') === 'settings') setTab('settings');
-    setGroupId(params.has('radical') ? `radical:${params.get('radical')}`
-      : params.has('topic') ? `topic:${params.get('topic')}` : params.has('all') ? 'all' : '');
-    setPreferredCharacter(params.get('character') ?? '');
+    const restoreTab = () => {
+      const params = new URLSearchParams(window.location.search);
+      setTab(params.get('view') === 'settings' ? 'settings' : 'study');
+      setActivity(params.get('activity') === 'review' ? 'review' : 'learn');
+      setGroupId(params.has('textbook') ? `textbook:${params.get('textbook')}:${params.get('lesson')}` : params.has('deck') ? `deck:${params.get('deck')}` : params.has('radical') ? `radical:${params.get('radical')}`
+        : params.has('topic') ? `topic:${params.get('topic')}` : params.has('all') ? 'all' : '');
+      setPreferredCharacter(params.get('character') ?? ''); setCurrentCharacter('');
+    };
+    restoreTab();
     void loadContent().then(value => { if (active) setContent(value); }).catch(failure => { if (active) setError(String(failure)); });
+    window.addEventListener('popstate', restoreTab);
     const timer = window.setInterval(() => setNow(new Date()), 10_000);
-    // Service worker sinh từ build cache shell và JSON, chỉ đăng ký ở production.
-    if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
-      void navigator.serviceWorker.register('/sw.js').catch(() => { /* Học vẫn lưu Dexie nếu browser không hỗ trợ SW. */ });
-    }
-    return () => { active = false; window.clearInterval(timer); };
+    return () => { active = false; window.clearInterval(timer); window.removeEventListener('popstate', restoreTab); };
   }, []);
+  useEffect(() => {
+    setHskError('');
+    if (!groupId.startsWith('textbook:')) return;
+    let active = true;
+    void loadHskContent().then(value => { if (active) setHsk(value); }).catch(() => { if (active) setHskError('Chưa tải được nội dung giáo trình. Hãy kết nối mạng và thử lại.'); });
+    return () => { active = false; };
+  }, [groupId]);
   const local = useLiveQuery(async () => {
     if (!database) return undefined;
     const [cards, learned, settings, reviews, drafts] = await Promise.all([
@@ -122,12 +145,16 @@ export function LearningApp() {
   const due = local ? dueCards(local.cards) : [];
   const learnedIds = new Set(local?.learned.map(entry => entry.id));
   const introducedToday = local?.learned.filter(entry => entry.introducedAt >= startOfDay(now)).length ?? 0;
-  const groups = useMemo(() => content ? studyGroups(content.characters, local?.settings.order ?? 'hsk') : [],
-    [content, local?.settings.order]);
+  const groups = useMemo(() => content ? [...studyGroups(content.characters, local?.settings.order ?? 'hsk'), ...memoryDecks(content.characters).map(deck => ({ id: `deck:${deck.id}`, kind: 'memory' as const, title: deck.title, characters: deck.characters })), ...(hsk?.lessons.filter(lesson => `textbook:${lesson.bookId}:${lesson.number}` === groupId).map(lesson => ({ id: `textbook:${lesson.bookId}:${lesson.number}`, kind: 'textbook' as const, title: `HSK ${lesson.bookId.toUpperCase()} · Chữ trong bài ${lesson.number}`, characters: hskCharacters(lesson, content.characters).characters })) ?? [])] : [],
+    [content, local?.settings.order, hsk, groupId]);
   const recommendation = useMemo(() => content && local
     ? dailyRecommendation(content.characters, local.learned, local.settings, now) : null,
     [content, local?.learned, local?.settings, dayKey(now)]);
   const selectedGroup = groupId ? groups.find(group => group.id === groupId) : recommendation;
+  const textbookLesson = hsk?.lessons.find(lesson => `textbook:${lesson.bookId}:${lesson.number}` === groupId);
+  // Luyện chữ trong giáo trình dùng từ của chính bài, không lấy ngữ cảnh từ bộ khởi đầu khác.
+  const lessonWords = textbookLesson ? textbookLesson.words.map(word => ({ id: word.text, simplified: word.text,
+    pinyin: word.pinyin, meaning: [word.meaning], chars: [...word.text] })) : content?.words ?? [];
   const deck = groupId === 'all' && content && local ? orderedCharacters(content.characters, local.settings.order)
     : selectedGroup?.characters ?? [];
   const candidates = deck.filter(character => !learnedIds.has(character.id));
@@ -147,11 +174,24 @@ export function LearningApp() {
   const knownBeforeToday = new Set(local?.learned.filter(entry => entry.introducedAt < startOfDay(now)).map(entry => entry.id));
   const planCharacters = groupId ? deck.filter(entry => !knownBeforeToday.has(entry.id)).slice(0, goal)
     : recommendation?.characters ?? [];
-  const card = due[0];
+  // Bộ ghi nhớ giới hạn phiên ôn theo đúng chữ trong bộ, vẫn giữ hạn FSRS hiện tại.
+  const scopedDue = (groupId.startsWith('deck:') || groupId.startsWith('textbook:')) ? due.filter(card => deck.some(item => item.id === card.targetId)) : due;
+  const card = scopedDue[0];
   const character = content?.characters.find(entry => entry.id === card?.targetId);
+  function selectTab(value: 'study' | 'settings') {
+    // Giữ nhịp học trong URL để reload và nút quay lại mở đúng màn hình.
+    if (value === tab) return;
+    setTab(value);
+    const params = new URLSearchParams(window.location.search);
+    if (value === 'settings') params.set('view', 'settings'); else params.delete('view');
+    history.pushState(null, '', params.size ? `/?${params}` : '/');
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }
   function selectGroup(id: string) {
     setGroupId(id); setPreferredCharacter(''); setCurrentCharacter(''); setActivity('learn');
     const params = new URLSearchParams();
+    if (id.startsWith('textbook:')) { const [, book, lesson] = id.split(':'); params.set('textbook', book); params.set('lesson', lesson); }
+    if (id.startsWith('deck:')) params.set('deck', id.slice(5));
     if (id.startsWith('radical:')) params.set('radical', id.slice(8));
     if (id.startsWith('topic:')) params.set('topic', id.slice(6));
     if (id === 'all') params.set('all', '1');
@@ -160,9 +200,9 @@ export function LearningApp() {
     showLesson();
   }
   function selectCharacter(id: string) {
-    setPreferredCharacter(id); setCurrentCharacter(id); setActivity('learn'); setPreview(false);
+    setTab('study'); setPreferredCharacter(id); setCurrentCharacter(id); setActivity('learn'); setPreview(false);
     const params = new URLSearchParams(window.location.search);
-    params.set('character', id);
+    params.delete('view'); params.set('character', id);
     history.replaceState(null, '', `/?${params}`);
     showLesson();
   }
@@ -172,11 +212,8 @@ export function LearningApp() {
   }
   return <main className="shell">
     {/* Điều hướng document để service worker phục vụ HTML đã cache trên hosting tĩnh. */}
-    <header className="topbar"><a href="/" className="brand"><span className="brand-mark">字</span><span>Hán ngữ<small>Hiểu từng chữ. Nhớ lâu hơn.</small></span></a>
-      <a className="mobile-jump" href="#today-plan">Bộ học <span aria-hidden="true">↓</span></a>
-      <nav aria-label="Điều hướng chính"><button className={`nav-button ${tab === 'study' ? 'active' : ''}`} aria-pressed={tab === 'study'} onClick={() => setTab('study')}>Học tập</button>
-        <a href="/browse/">Từ điển</a><a href="/progress/">Tiến độ</a><button className={`nav-button ${tab === 'settings' ? 'active' : ''}`} aria-pressed={tab === 'settings'} onClick={() => setTab('settings')}>Cài đặt</button></nav></header>
-    <div className="intro learning-intro"><div><span className="eyebrow"><span className="desktop-heading">MỖI NGÀY MỘT CHÚT · {authReady ? now.toLocaleDateString('vi-VN') : 'HỌC ĐỀU, NHỚ LÂU'}</span>
+    <AppHeader current={tab === 'settings' ? 'settings' : 'study'} onStudyAction={() => selectTab('study')} onSettingsAction={() => selectTab('settings')} />
+    <div id="page-content" tabIndex={-1} className="intro learning-intro"><div><span className="eyebrow"><span className="desktop-heading">MỖI NGÀY MỘT CHÚT · {authReady ? now.toLocaleDateString('vi-VN') : 'HỌC ĐỀU, NHỚ LÂU'}</span>
       <span className="mobile-heading">{tab === 'settings' ? 'NHỊP HỌC CÁ NHÂN' : `HỌC HÔM NAY · ${groupId === 'all' ? 'TOÀN BỘ CHỮ' : selectedGroup?.title ?? 'CHỮ CƠ BẢN'}`}</span></span>
       <h1><span className="desktop-heading">{tab === 'settings' ? 'Học theo nhịp của bạn.' : 'Hôm nay, thêm một chút hiểu biết.'}</span>
         <span className="mobile-heading">{tab === 'settings' ? 'Nhịp học của bạn.' : 'Học từng chữ, nhớ lâu.'}</span></h1>
@@ -204,25 +241,30 @@ export function LearningApp() {
         </button></li>)}
       </ul></details>
       {groupId && <button className="secondary" onClick={() => selectGroup('')}>Học bộ gợi ý hôm nay</button>}
+      <p><a href="/courses/">Bộ ghi nhớ & giáo trình HSK →</a></p>
       <details><summary>Đổi bộ học</summary><label>Bộ chữ đang học<select value={groupId} onChange={event => selectGroup(event.target.value)}>
         <option value="">Gợi ý hôm nay · {recommendation.title}</option>
         <option value="all">Toàn bộ {content.characters.length.toLocaleString('vi-VN')} chữ</option>
+        <optgroup label="Bài giáo trình đang chọn">{groups.filter(group => group.kind === 'textbook').map(group => <option key={group.id} value={group.id}>{group.title}</option>)}</optgroup>
+        <optgroup label="Bộ ghi nhớ ngắn">{groups.filter(group => group.kind === 'memory').map(group => <option key={group.id} value={group.id}>{group.title} · {group.characters.length} chữ</option>)}</optgroup>
         <optgroup label="Cùng chủ đề">{groups.filter(group => group.kind === 'topic').map(group =>
           <option key={group.id} value={group.id}>{group.title} · {group.characters.length} chữ</option>)}</optgroup>
         <optgroup label="Cùng bộ thủ">{groups.filter(group => group.kind === 'radical').map(group =>
           <option key={group.id} value={group.id}>{group.title} · {group.characters.length} chữ</option>)}</optgroup>
       </select></label><a href="/browse/">Chọn một chữ trong từ điển →</a></details>
+      {textbookLesson && <p className="muted">Đây là luyện chữ bổ trợ. Từ vựng và ngữ pháp nằm trong <a href={`/courses/?mode=hsk&book=${textbookLesson.bookId}&lesson=${textbookLesson.number}`}>bài giáo trình</a>.</p>}
       <p className="plan-remaining">{candidates.length} chữ chưa học trong lựa chọn</p>
     </section>}
     </div><div id="learning-workspace" className="learning-workspace">
       {/* Chuyển học/ôn ở ngay trên bài để mobile không phải tìm nút ở cuối phần bộ học. */}
       {tab === 'study' && <div className="actions study-activities workspace-tabs" role="group" aria-label="Hoạt động học">
         <button className={activity === 'learn' ? '' : 'secondary'} aria-pressed={activity === 'learn'} onClick={() => setActivity('learn')}>Học chữ mới</button>
-        <button className={activity === 'review' ? '' : 'secondary'} aria-pressed={activity === 'review'} onClick={() => setActivity('review')}>Ôn tập <span className="count-badge">{due.length}</span></button>
+        <button className={activity === 'review' ? '' : 'secondary'} aria-pressed={activity === 'review'} onClick={() => setActivity('review')}>Ôn tập <span className="count-badge">{scopedDue.length}</span></button>
       </div>}
-      {error ? <section className="panel error" role="alert">{error}<button onClick={() => location.reload()}>Thử lại</button></section>
-        : !authReady || !local || !content ? <section className="panel" role="status">Đang mở bộ học…</section>
-        : tab === 'settings' ? <><SettingsForm key={`${user?.uid ?? 'guest'}:${local.settings.revision}`} settings={local.settings} />
+      {error || hskError ? <section className="panel error" role="alert">{error || hskError}<button onClick={() => location.reload()}>Thử lại</button></section>
+        : !authReady || !local || !content || (groupId.startsWith('textbook:') && !hsk) ? <section className="panel" role="status">Đang mở bộ học…</section>
+        : groupId && groupId !== 'all' && !selectedGroup ? <section className="panel"><h2>Không tìm thấy bộ học này.</h2><a href="/courses/">Chọn lại bộ học →</a></section>
+        : tab === 'settings' ? <><SettingsForm key={user?.uid ?? 'guest'} settings={local.settings} />
           {local.learned.map(entry => {
             const found = content.characters.find(item => item.id === entry.id);
             return found ? <MnemonicEditor key={`${entry.id}:${entry.updatedAt}`} character={found} mnemonic={entry.mnemonic} /> : null;
@@ -230,13 +272,13 @@ export function LearningApp() {
         // Chỉ đổi phiên khi đã chấm thẻ; đồng bộ revision/mẹo nhớ không xóa bài đang viết.
         : activity === 'review' && card && character ? <ReviewCard key={`${database?.name}:${card.id}:${card.fsrsState.reps}`} card={card} character={character} />
         : activity === 'review' && card ? <section className="panel error">Chữ {card.targetId} chưa có trong từ điển phiên bản này.</section>
-        : activity === 'review' ? <section className="panel"><h2>Đã ôn xong các thẻ đến hạn.</h2><button onClick={() => setActivity('learn')}>Tiếp tục học chữ mới →</button></section>
+        : activity === 'review' ? <section className="panel"><h2>Đã ôn xong các thẻ đến hạn trong lựa chọn.</h2><p><a href="/courses/">Chọn bộ học khác →</a></p><button onClick={() => setActivity('learn')}>Tiếp tục học chữ mới →</button></section>
         : next && introducedToday < local.settings.newPerDay ? <CharacterLesson key={`${database?.name}:${next.id}`} character={next}
-          characters={content.characters} words={content.words} contentVersion={content.version} peers={deck.length > 1 ? deck : content.characters.slice(0, 24)}
-          onPracticeStart={() => setPreview(false)} onSaved={showLesson} />
+          characters={content.characters} words={lessonWords} contentVersion={textbookLesson ? `${content.version}:${textbookLesson.id}` : content.version} peers={deck.length > 1 ? deck : content.characters.slice(0, 24)}
+          preferLessonWords={!!textbookLesson} onPracticeStart={() => setPreview(false)} onSaved={showLesson} />
         : <section className="panel"><h2>{introducedToday >= local.settings.newPerDay ? 'Đã đạt mục tiêu chữ mới hôm nay.' : 'Đã học hết chữ trong bộ đã chọn.'}</h2>
           <p>{introducedToday >= local.settings.newPerDay ? 'Ngày mai sẽ có bộ gợi ý mới. Bạn có thể điều chỉnh số chữ mỗi ngày trong Cài đặt.' : 'Bạn có thể chọn bộ hoặc chủ đề khác để học tiếp.'}</p>
-          {due.length > 0 && <button onClick={() => setActivity('review')}>Ôn {due.length} thẻ đến hạn →</button>}
+          {scopedDue.length > 0 && <button onClick={() => setActivity('review')}>Ôn {scopedDue.length} thẻ đến hạn →</button>}
           <p className="muted">{local.cards.filter(item => item.fsrsState.state !== State.New).sort((a,b) => a.fsrsState.due.getTime() - b.fsrsState.due.getTime())[0]?.fsrsState.due.toLocaleString('vi-VN')}</p>
         </section>}
     </div><aside className="learning-support">
@@ -248,7 +290,7 @@ export function LearningApp() {
         <p>Đọc thành tiếng, gắn chữ với một từ quen thuộc và ôn lại khi đến hạn.</p><small>3–5 chữ mỗi ngày là một nhịp khởi đầu nhẹ nhàng.</small></section><AccountPanel />
     </aside></div>
     <footer>Hán ngữ · Tiến độ được lưu trên thiết bị. <a href="/browse/">Khám phá từ điển →</a></footer>
-    <MobileNavigation current={tab === 'settings' ? 'settings' : 'study'} onStudyAction={() => { setTab('study'); window.scrollTo({ top: 0, behavior: 'instant' }); }}
-      onSettingsAction={() => { setTab('settings'); window.scrollTo({ top: 0, behavior: 'instant' }); }} />
+    <MobileNavigation current={tab === 'settings' ? 'settings' : 'study'} onStudyAction={() => selectTab('study')}
+      onSettingsAction={() => selectTab('settings')} />
   </main>;
 }

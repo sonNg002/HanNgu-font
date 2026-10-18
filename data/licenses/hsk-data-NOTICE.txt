@@ -1,0 +1,29 @@
+HSK Standard Course companion dataset
+
+Source: Chinese Zero to Hero, via Open Language Profiles
+https://github.com/openlanguageprofiles/olp-zh-zerotohero
+https://www.zerotohero.ca/
+
+CC-CEDICT definitions: Creative Commons Attribution-ShareAlike 4.0 International
+https://creativecommons.org/licenses/by-sa/4.0/
+https://www.mdbg.net/chinese/dictionary?page=cedict
+Remaining source dataset: CC0
+https://creativecommons.org/publicdomain/zero/1.0/
+
+This adapted data file is distributed under CC BY-SA 4.0; attribution and the
+share-alike requirement apply to the data, not automatically to application code.
+
+Modifications by HanNgu: grouped into 146 numbered lessons and nine volumes;
+merged duplicate word/pronunciation pairs within a lesson; excluded unnumbered
+supplementary vocabulary and appendix grammar; selected vocabulary/grammar fields.
+Source CSV SHA-256 hashes are recorded in data/hsk-standard.json.
+Retrieved 2026-10-16. English definitions are retained in the source snapshot.
+Vietnamese display translations were generated with Google Translate on 2026-10-18.
+They are machine translations and have not received a complete linguistic review.
+The translation mapping is stored in data/vietnamese-translations.json; production
+builds apply it without contacting a translation service. The adapted Vietnamese
+HSK data retains the CC BY-SA 4.0 attribution and share-alike requirements above.
+
+This is an open companion dataset, not an official publisher-certified digital
+edition. Textbook text, illustrations, and audio are not included. Lesson mapping
+and linguistic content may contain source errors; report corrections with source.

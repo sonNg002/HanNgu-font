@@ -49,12 +49,13 @@ export function matchesHanViet(answer: string, readings: string[]): boolean {
   return !!key(answer) && readings.some(reading => key(reading) === key(answer));
 }
 
-export function lessonExample(character: Character, words: Word[]): Example | undefined {
+export function lessonExample(character: Character, words: Word[], preferLessonWords = false): Example | undefined {
   // Chỉ tạo câu hỏi từ ví dụ/từ có thật trong kho; không ghép tùy ý thành từ mới.
   const example = character.examples.find(entry => entry.text.includes(character.id) && entry.translation.trim());
-  if (example) return example;
+  if (example && !preferLessonWords) return example;
   const word = words.find(entry => entry.simplified.includes(character.id) && entry.meaning.length > 0);
-  return word ? { text: word.simplified, translation: word.meaning.join(' · '), pinyin: word.pinyin || undefined, source: 'Từ điển của bộ học' } : undefined;
+  // Bài theo sách ưu tiên từ trong bài; ví dụ biên soạn của chữ vẫn dùng cho bộ tự do.
+  return word ? { text: word.simplified, translation: word.meaning.join(' · '), pinyin: word.pinyin || undefined, source: 'Từ điển của bộ học' } : preferLessonWords ? undefined : example;
 }
 
 export function contextChoices(character: Character, peers: Character[]): string[] {
