@@ -8,11 +8,22 @@ async function files(directory) {
     ? files(path.join(directory, entry.name)) : [path.join(directory, entry.name)]));
   return nested.flat();
 }
-const assets = (await files('out')).filter(file => /\.(js|css|json|html|txt|svg)$/i.test(file));
+// Không đưa worker cũ vào snapshot: build lại cùng nội dung phải giữ nguyên phiên bản.
+const assets = (await files('out')).filter(file => /\.(js|css|json|html|txt|svg)$/i.test(file)
+  && path.relative('out', file) !== 'sw.js').sort();
 const hash = createHash('sha256');
-for (const asset of assets.sort()) hash.update(await readFile(asset));
+// Đọc theo lô giới hạn để giảm I/O tuần tự, nhưng hash theo thứ tự cố định.
+// Hash cả đường dẫn và độ dài để đổi tên hay ranh giới file đều làm đổi phiên bản.
+for (let index = 0; index < assets.length; index += 32) {
+  const batch = assets.slice(index, index + 32);
+  const contents = await Promise.all(batch.map(asset => readFile(asset)));
+  for (let offset = 0; offset < batch.length; offset++) {
+    hash.update(JSON.stringify([path.relative('out', batch[offset]).replaceAll('\\', '/'), contents[offset].length]));
+    hash.update(contents[offset]);
+  }
+}
 const version = hash.digest('hex').slice(0, 16);
-const urls = [...new Set(['/', '/browse/', ...assets.map(file => '/' + path.relative('out', file).replaceAll('\\', '/'))])];
+const urls = [...new Set(['/', '/browse/', '/progress/', '/courses/', ...assets.map(file => '/' + path.relative('out', file).replaceAll('\\', '/'))])];
 // SW cache đúng một phiên bản build; không cache Firebase/token hoặc request bên ngoài origin.
 await writeFile('out/sw.js', `
 const CACHE = 'hanzi-${version}';

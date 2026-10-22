@@ -1,4 +1,4 @@
-import type { WritingAssessment } from './writing';
+import type { WritingAssessment, WritingResult } from './writing';
 import type { Card as FSRSCard, ReviewLog as FSRSLog } from 'ts-fsrs';
 
 export type CardType = 'recognize' | 'write' | 'recall-hv';
@@ -9,6 +9,7 @@ export interface Character {
   // Bộ thủ chính dùng để phân nhóm; biến thể giữ riêng để hiện đúng thành phần chữ.
 strokes: number; radical?: string; radicalNumber?: number; radicalVariant?: string;
   readingSource?: 'curated' | 'unihan'; meaningLanguage?: 'vi' | 'en'; components: string[]; decomposition?: string; etymology?: string;
+  meaningTranslation?: 'machine';
   hsk?: number; freq: number; mnemonic: string; examples: Example[]; source: string[];
 }
 export interface Word { id: string; simplified: string; pinyin: string; meaning: string[]; chars: string[] }
@@ -26,7 +27,15 @@ export interface ReviewLog extends SyncFields {
 }
 export interface Settings extends SyncFields { id: 'main'; newPerDay: number; order: 'hsk' | 'freq' }
 export interface SyncMeta { id: string; value: number }
-export const CARD_TYPES: CardType[] = ['recognize', 'write', 'recall-hv'];
+// Bài dở thuộc kho riêng trên thiết bị, không phải thẻ đã học hoặc dữ liệu đồng bộ.
+export interface LessonDraft {
+  id: string; contentVersion: string; updatedAt: number; step: 0 | 1 | 2 | 3;
+  // hanViet chỉ còn ở bài dở cũ; bài học không hỏi âm Hán Việt nữa.
+  mnemonic: string; pinyin: string; hanViet?: string; writing?: WritingResult; applied: boolean;
+}
+// 'recall-hv' giữ trong CardType để đọc và đồng bộ thẻ cũ, nhưng không tạo hoặc ôn nữa.
+export const CARD_TYPES: CardType[] = ['recognize', 'write'];
+export const isActiveCardType = (type: CardType) => CARD_TYPES.includes(type);
 export const TYPE_LABELS: Record<CardType, string> = {
   recognize: 'Nhận mặt chữ', write: 'Tập viết', 'recall-hv': 'Nhớ Hán Việt',
 };

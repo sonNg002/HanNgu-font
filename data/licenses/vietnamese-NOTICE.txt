@@ -1,0 +1,14 @@
+Vietnamese dictionary display translations
+
+Generated 2026-10-18 using Google Translate from the public source definitions in
+data/corpus.json and data/hsk-standard.json. The English source snapshots are kept
+unchanged. Cached translations: data/vietnamese-translations.json.
+Selected terminology corrections: data/vietnamese-reviewed.json.
+
+These machine translations have not received a complete linguistic review.
+They are supplementary learning aids, not publisher-certified textbook content.
+
+Original attribution and license terms remain applicable. See hsk-data-NOTICE.txt
+for CC-CEDICT / Open Language Profiles attribution and CC BY-SA 4.0 terms, and
+unicode-LICENSE.txt for Unicode Unihan source terms. Vietnamese HSK adaptations
+remain distributed under CC BY-SA 4.0. Application code licensing is unchanged.

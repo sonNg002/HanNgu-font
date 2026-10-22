@@ -17,5 +17,5 @@ export function searchKey(value: string) { return value.normalize('NFD').replace
 export function filterCharacters(characters: Character[], radical: string, query = '') {
   const key = searchKey(query.trim());
   return characters.filter(character => (!radical || String(character.radicalNumber) === radical) && (!key ||
-    searchKey([character.id, ...character.pinyin, ...character.hanViet, ...character.meaning].join(' ')).includes(key)));
+    searchKey([character.id, ...character.pinyin, ...character.meaning].join(' ')).includes(key)));
 }

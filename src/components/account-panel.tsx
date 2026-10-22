@@ -31,6 +31,8 @@ export function AccountPanel() {
     <p role="status">{!online ? 'Đang offline · tiến độ lưu trên thiết bị' : status.phase === 'syncing'
       ? 'Đang đồng bộ…' : user ? `${status.pending} thay đổi đang chờ đồng bộ` : 'Chế độ học trên thiết bị'}</p>
     {status.message && <p role="alert" className="error">{status.message}</p>}
+    {/* Thu gọn tài khoản để bài học và bộ gợi ý là nội dung chính; form đăng nhập vẫn dễ mở khi cần. */}
+    <details><summary>{user ? 'Quản lý tài khoản' : 'Đăng nhập để đồng bộ'}</summary>
     {!firebaseConfigured ? <p className="muted">Đăng nhập chưa khả dụng. Bạn vẫn có thể học trên thiết bị.</p>
       : !authReady ? <p>Đang khôi phục tài khoản…</p>
       : user ? <>
@@ -53,5 +55,6 @@ export function AccountPanel() {
         <p className="muted">Tiến độ khách và mỗi tài khoản được lưu riêng trên thiết bị.</p>
       </>}
     {error && <p role="alert" className="error">{error}</p>}
+    </details>
   </section>;
 }

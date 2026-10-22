@@ -160,6 +160,5 @@ export function WritingPractice({ character, initialMode = 'trace', disabled = f
       {mode === 'free' && phase === 'writing' && <button type="button" className="text-button" disabled={disabled} onClick={hint}>Gợi ý nét đang viết</button>}
       {mode === 'trace' && phase === 'complete' && <button type="button" disabled={disabled} onClick={() => reset('free')}>Ẩn mẫu và tự viết →</button>}
     </div>
-    <p className="muted writing-note">Hệ thống kiểm tra hình dạng, hướng và thứ tự từng nét khi nhấc bút. Nét sai cần viết lại.</p>
   </div>;
 }
