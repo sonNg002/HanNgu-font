@@ -11,10 +11,9 @@ export function OfflineStatus() {
     if (!('serviceWorker' in navigator)) { setStatus('unsupported'); return; }
     return observeOffline(navigator.serviceWorker, setStatus);
   }, [retry]);
-  if (!status) return null;
-  return <div className="offline-status"><p role="status">{status === 'ready' ? 'Đã tải gói học offline trên thiết bị này.'
-    : status === 'preparing' ? 'Đang chuẩn bị gói học offline. Giữ kết nối đến khi hoàn tất.'
-    : status === 'unsupported' ? 'Trình duyệt này chưa hỗ trợ tải gói học offline.'
+  // Đã tải xong hoặc trình duyệt không hỗ trợ thì không cần báo; chỉ hiện khi đang tải hoặc lỗi.
+  if (!status || status === 'ready' || status === 'unsupported') return null;
+  return <div className="offline-status"><p role="status">{status === 'preparing' ? 'Đang tải gói học offline…'
     : 'Chưa tải xong gói học offline. Hãy kiểm tra kết nối và dung lượng thiết bị.'}</p>
     {status === 'error' && <button className="secondary" onClick={() => setRetry(value => value + 1)}>Thử tải lại gói offline</button>}
   </div>;

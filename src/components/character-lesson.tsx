@@ -36,9 +36,10 @@ function Pronunciation({ text }: { text: string }) {
     utterance.voice = voice; utterance.lang = voice.lang; utterance.rate = 0.8;
     spoken.current = true; window.speechSynthesis.cancel(); window.speechSynthesis.speak(utterance);
   }
+  // Thiết bị không có giọng Mandarin thì ẩn hẳn nút, không thêm dòng giải thích.
+  if (!voice) return null;
   return <div className="lesson-audio">
-    <button type="button" className="secondary" disabled={!voice} onClick={speak}>Nghe cách đọc</button>
-    <small className="muted">{voice ? 'Nghe một lần rồi đọc thành tiếng theo mẫu.' : 'Thiết bị chưa có giọng đọc Mandarin. Bạn có thể đọc theo Pinyin.'}</small>
+    <button type="button" className="secondary" onClick={speak}>Nghe cách đọc</button>
   </div>;
 }
 
@@ -48,8 +49,6 @@ function CharacterExplanation({ character, characters, mnemonic }: { character: 
       <h2>{character.meaning.join(' · ')}</h2><p><strong>{character.pinyin.join(' / ')}</strong></p>
       <Pronunciation text={character.id} />
     </div></div>
-    {character.meaningLanguage === 'en' && <p className="muted">Nghĩa của chữ này hiện dùng tiếng Anh trong từ điển.</p>}
-    {character.meaningTranslation === 'machine' && <p className="muted">Nghĩa tiếng Việt được dịch máy; hãy đối chiếu ngữ cảnh khi học.</p>}
     <div className="lesson-association">
       <h3>Nhìn thành phần để nhớ hình</h3>
       {character.components.length > 0 ? <ul className="component-parts">{character.components.map((part, index) => {
@@ -57,7 +56,6 @@ function CharacterExplanation({ character, characters, mnemonic }: { character: 
         return <li key={`${part}:${index}`}><strong>{part}</strong><span>{found?.meaning.join(' · ') ?? 'Thành phần chữ'}</span></li>;
       })}</ul> : <p>Quan sát hình tổng thể và thứ tự nét của chữ.</p>}
       <p>{mnemonic || 'Hãy gắn hình chữ với một hình ảnh hoặc tình huống quen thuộc của bạn.'}</p>
-      <small className="muted">Câu chuyện giúp nhớ hình chữ; không phải giải thích nguồn gốc lịch sử.</small>
     </div>
   </div>;
 }
@@ -108,7 +106,7 @@ export function CharacterLesson({ character, characters, words, peers, contentVe
     void saveLessonDraft(database, {
       id: character.id, contentVersion, updatedAt: Date.now(), step, mnemonic, pinyin,
       ...(writing ? { writing } : {}), applied,
-    }).then(saved => { if (active && saved) setDraftStatus('Bài dở đã lưu trên thiết bị'); })
+    }).then(saved => { if (active && saved) setDraftStatus(''); })
       .catch(() => { if (active) setDraftStatus('Chưa lưu được bài dở. Hãy giữ trang mở cho đến khi lưu bài.'); });
     return () => { active = false; };
   }, [database, draftReady, character.id, contentVersion, step, mnemonic, pinyin, writing, applied]);
@@ -160,13 +158,13 @@ export function CharacterLesson({ character, characters, words, peers, contentVe
       <details><summary>Viết câu chuyện nhớ chữ của riêng bạn</summary>
         <label>Mẹo nhớ<textarea maxLength={2000} value={mnemonic} onChange={event => setMnemonic(event.target.value)} /></label>
       </details>
-      <p className="muted">Nhìn chữ và đọc Pinyin thành tiếng. Sau đó thử gọi lại cách đọc khi đáp án đã ẩn.</p>
+      
       <button onClick={() => { onPracticeStart(); setStep(1); setFeedback(''); }}>Ẩn đáp án và thử nhớ →</button>
     </>}
 
     {step === 1 && <>
       <h2>Chữ này đọc thế nào?</h2><div className="hanzi">{character.id}</div>
-      <p className="muted">Thử nhớ trước khi mở lại bài. Bạn có thể nhập Pinyin có dấu hoặc số thanh.</p>
+      
       <form onSubmit={checkRecall}>
         <label>Pinyin<input required autoComplete="off" autoCapitalize="none" spellCheck={false} value={pinyin} onChange={event => setPinyin(event.target.value)}
           placeholder="Nhập Pinyin có dấu hoặc số thanh" aria-invalid={!!recallError} aria-describedby="pinyin-error" /></label>
@@ -202,7 +200,7 @@ export function CharacterLesson({ character, characters, words, peers, contentVe
         <button className="secondary" onClick={() => { setApplied(true); setFeedback('Hãy giữ liên hệ này cho lần ôn tiếp theo.'); }}>Tôi đã tạo liên hệ cho chữ</button>
       </div>}
       <p className={applied ? 'success' : 'muted'} role="status">{feedback}</p>
-      {applied && <div className="lesson-finish"><p>Đã luyện âm đọc, tự viết và dùng chữ. Các lần ôn sau sẽ giúp kiểm tra bạn còn nhớ đến đâu.</p>
+      {applied && <div className="lesson-finish">
         <button disabled={busy} onClick={() => void save()}>{busy ? 'Đang lưu…' : 'Lưu và học chữ tiếp theo →'}</button>
       </div>}
     </>}

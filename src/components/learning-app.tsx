@@ -171,6 +171,7 @@ export function LearningApp() {
     // Giữ chữ đang làm khi một tab khác lưu bài dở mới hơn; chỉ đổi khi chữ đã học hoặc đổi bộ.
     if (next) setCurrentCharacter(next.id);
   }, [next?.id]);
+  const otherDrafts = local?.drafts.filter(entry => !learnedIds.has(entry.id) && entry.id !== next?.id) ?? [];
   const goal = local?.settings.newPerDay ?? DEFAULT_SETTINGS.newPerDay;
   const remaining = Math.max(0, goal - introducedToday);
   // Preview theo đúng bộ đã chọn; giữ chữ học hôm nay, loại chữ đã biết từ những ngày trước.
@@ -216,18 +217,13 @@ export function LearningApp() {
   return <main className="shell">
     {/* Điều hướng document để service worker phục vụ HTML đã cache trên hosting tĩnh. */}
     <AppHeader current={tab === 'settings' ? 'settings' : 'study'} onStudyAction={() => selectTab('study')} onSettingsAction={() => selectTab('settings')} />
-    <div id="page-content" tabIndex={-1} className="intro learning-intro"><div><span className="eyebrow"><span className="desktop-heading">MỖI NGÀY MỘT CHÚT · {authReady ? now.toLocaleDateString('vi-VN') : 'HỌC ĐỀU, NHỚ LÂU'}</span>
-      <span className="mobile-heading">{tab === 'settings' ? 'NHỊP HỌC CÁ NHÂN' : `HỌC HÔM NAY · ${groupId === 'all' ? 'TOÀN BỘ CHỮ' : selectedGroup?.title ?? 'CHỮ CƠ BẢN'}`}</span></span>
+    {/* Đầu trang chỉ giữ tiêu đề và mục tiêu ngày; số liệu chi tiết nằm ở trang Tiến độ. */}
+    <div id="page-content" tabIndex={-1} className="intro learning-intro"><div>
       <h1><span className="desktop-heading">{tab === 'settings' ? 'Học theo nhịp của bạn.' : 'Hôm nay, thêm một chút hiểu biết.'}</span>
-        <span className="mobile-heading">{tab === 'settings' ? 'Nhịp học của bạn.' : 'Học từng chữ, nhớ lâu.'}</span></h1>
-      <p>{tab === 'settings' ? 'Điều chỉnh mục tiêu và giữ những câu chuyện nhớ chữ của riêng bạn.' : 'Hiểu chữ. Gọi lại trí nhớ. Viết và dùng trong từ.'}</p></div>
-      <div className="daily-goal"><div><span>Mục tiêu hôm nay</span><strong>{introducedToday}<small> / {goal} chữ</small></strong></div>
+        <span className="mobile-heading">{tab === 'settings' ? 'Nhịp học của bạn.' : 'Học từng chữ, nhớ lâu.'}</span></h1></div>
+      {tab === 'study' && <div className="daily-goal"><div><span>Mục tiêu hôm nay</span><strong>{introducedToday}<small> / {goal} chữ</small></strong></div>
         <progress value={Math.min(introducedToday, goal)} max={goal} aria-label="Tiến độ chữ mới hôm nay" />
-        <small>{remaining ? `Còn ${remaining} chữ để hoàn thành` : 'Đã hoàn thành mục tiêu hôm nay ✓'}</small>
-      </div></div>
-    <div className="stats"><div><span>Chữ đã học</span><strong>{local?.learned.length ?? 0}<small> chữ</small></strong></div>
-      <div><span>Đến hạn</span><strong>{due.length}<small> thẻ ôn</small></strong></div><div><span>Lượt ôn hôm nay</span><strong>{local?.reviews.length ?? 0}<small> lượt</small></strong></div>
-      <div><span>Chữ mới hôm nay</span><strong>{introducedToday}<small> / {goal} chữ</small></strong></div></div>
+      </div>}</div>
     <div className={`learning-layout ${tab === 'settings' ? 'settings-layout' : ''}`}>
     <div className="learning-plan">
     {tab === 'study' && content && recommendation && <section id="today-plan" className="panel study-deck">
@@ -256,7 +252,6 @@ export function LearningApp() {
           <option key={group.id} value={group.id}>{group.title} · {group.characters.length} chữ</option>)}</optgroup>
       </select></label><a href="/browse/">Chọn một chữ trong từ điển →</a></details>
       {textbookLesson && <p className="muted">Đây là luyện chữ bổ trợ. Từ vựng và ngữ pháp nằm trong <a href={`/courses/?mode=hsk&book=${textbookLesson.bookId}&lesson=${textbookLesson.number}`}>bài giáo trình</a>.</p>}
-      <p className="plan-remaining">{candidates.length} chữ chưa học trong lựa chọn</p>
     </section>}
     </div><div id="learning-workspace" className="learning-workspace">
       {/* Chuyển học/ôn ở ngay trên bài để mobile không phải tìm nút ở cuối phần bộ học. */}
@@ -267,7 +262,7 @@ export function LearningApp() {
       {error || hskError ? <section className="panel error" role="alert">{error || hskError}<button onClick={() => location.reload()}>Thử lại</button></section>
         : !authReady || !local || !content || (groupId.startsWith('textbook:') && !hsk) ? <section className="panel" role="status">Đang mở bộ học…</section>
         : groupId && groupId !== 'all' && !selectedGroup ? <section className="panel"><h2>Không tìm thấy bộ học này.</h2><a href="/courses/">Chọn lại bộ học →</a></section>
-        : tab === 'settings' ? <><SettingsForm key={user?.uid ?? 'guest'} settings={local.settings} />
+        : tab === 'settings' ? <><AccountPanel /><SettingsForm key={user?.uid ?? 'guest'} settings={local.settings} />
           {local.learned.map(entry => {
             const found = content.characters.find(item => item.id === entry.id);
             return found ? <MnemonicEditor key={`${entry.id}:${entry.updatedAt}`} character={found} mnemonic={entry.mnemonic} /> : null;
@@ -286,12 +281,11 @@ export function LearningApp() {
           <p className="muted">{local.cards.filter(item => item.fsrsState.state !== State.New).sort((a,b) => a.fsrsState.due.getTime() - b.fsrsState.due.getTime())[0]?.fsrsState.due.toLocaleString('vi-VN')}</p>
         </section>}
     </div><aside className="learning-support">
-      {!!local?.drafts.length && remaining > 0 && <section className="panel resume-panel"><span className="eyebrow">BẠN ĐANG HỌC</span><h2>Tiếp tục từ chỗ dừng</h2>
-        <div className="draft-list">{local.drafts.filter(entry => !learnedIds.has(entry.id)).slice(0, 3).map(entry =>
+      {/* Chỉ gợi ý bài dở khác chữ đang mở, tránh lặp lại đúng bài phía trên. */}
+      {tab === 'study' && remaining > 0 && !!otherDrafts.length && <section className="panel resume-panel"><span className="eyebrow">BẠN ĐANG HỌC</span><h2>Tiếp tục từ chỗ dừng</h2>
+        <div className="draft-list">{otherDrafts.slice(0, 3).map(entry =>
           <button className="secondary" key={entry.id} onClick={() => selectCharacter(entry.id)}><span>{entry.id}</span> Bước {entry.step + 1}/4 <span aria-hidden="true">→</span></button>)}</div>
       </section>}
-      <section className="panel tip"><span className="eyebrow">NHỚ LÂU HƠN</span><h2>Thử nhớ trước khi xem.</h2>
-        <p>Đọc thành tiếng, gắn chữ với một từ quen thuộc và ôn lại khi đến hạn.</p><small>3–5 chữ mỗi ngày là một nhịp khởi đầu nhẹ nhàng.</small></section><AccountPanel />
     </aside></div>
     <footer>{APP_NAME} · Tiến độ được lưu trên thiết bị. <a href="/browse/">Khám phá từ điển →</a></footer>
     <MobileNavigation current={tab === 'settings' ? 'settings' : 'study'} onStudyAction={() => selectTab('study')}
