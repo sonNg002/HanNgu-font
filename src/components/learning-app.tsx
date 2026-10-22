@@ -18,6 +18,7 @@ import { WritingReview } from './writing-review';
 import { AccountPanel } from './account-panel';
 import { MobileNavigation } from './mobile-navigation';
 import { useStudy } from './study-provider';
+import { APP_NAME, cheer } from '@/lib/personal';
 
 function MemoryReviewCard({ card, character }: { card: StudyCard; character: Character }) {
   const { database } = useStudy();
@@ -39,10 +40,10 @@ function MemoryReviewCard({ card, character }: { card: StudyCard; character: Cha
     <span className="eyebrow">{TYPE_LABELS[card.type]}</span>
     {card.type === 'recognize' ? <div className="hanzi">{character.id}</div>
       : <><h2>{character.meaning.join(' · ')}</h2><p>{character.pinyin.join(' / ')}</p></>}
-    <p className="muted">{card.type === 'recall-hv' ? 'Nhớ chữ và âm Hán Việt trước khi mở đáp án.' : 'Nhớ nghĩa và cách đọc trước khi mở đáp án.'}</p>
+    <p className="muted">Nhớ nghĩa và cách đọc trước khi mở đáp án.</p>
     {!revealed ? <button onClick={() => setRevealed(true)}>Hiện đáp án</button> : <>
       <div className="answer"><div className="hanzi small">{character.id}</div>
-        <h2>{character.hanViet.join(' / ')}</h2><p>{character.pinyin.join(' / ')} · {character.meaning.join(' · ')}</p>
+        <h2>{character.pinyin.join(' / ')}</h2><p>{character.meaning.join(' · ')}</p>
         <p>{card.mnemonic || character.mnemonic}</p></div>
       <div className="ratings">{([1, 2, 3, 4] as RatingValue[]).map((rating, index) =>
         <button key={rating} disabled={busy} className={`rating rating-${rating}`} onClick={() => void grade(rating)}>
@@ -108,6 +109,8 @@ export function LearningApp() {
   const [preferredCharacter, setPreferredCharacter] = useState('');
   const [currentCharacter, setCurrentCharacter] = useState('');
   const [tab, setTab] = useState<'study' | 'settings'>('study');
+  // Lời nhắn sau khi lưu chữ: chọn một lần lúc lưu để không đổi khi trang render lại.
+  const [learnedCheer, setLearnedCheer] = useState('');
   useEffect(() => {
     let active = true;
     // Link từ từ điển vẫn mở đúng bộ/chữ; truy cập trang chủ mặc định dùng gợi ý ngày.
@@ -235,8 +238,8 @@ export function LearningApp() {
       {/* Thu gọn đáp án trước khi luyện nhớ/viết; học viên chủ động mở khi cần xem lại bộ. */}
       <details open={preview} onToggle={event => setPreview(event.currentTarget.open)}><summary>Xem {planCharacters.length} chữ đề xuất</summary><ul className="daily-characters" aria-label="Các chữ được đề xuất hôm nay">
         {planCharacters.map(item => <li key={item.id} className={learnedIds.has(item.id) ? 'learned' : ''}><button className="deck-character" disabled={learnedIds.has(item.id) || remaining === 0}
-          onClick={() => selectCharacter(item.id)} aria-label={`Học chữ ${item.id} · ${item.hanViet.join(' / ')}`}>
-          <span className="daily-glyph">{item.id}</span><span>{item.hanViet.join(' / ')}</span>
+          onClick={() => selectCharacter(item.id)} aria-label={`Học chữ ${item.id} · ${item.pinyin.join(' / ')}`}>
+          <span className="daily-glyph">{item.id}</span><span>{item.pinyin.join(' / ')}</span>
           <small>{learnedIds.has(item.id) ? 'Đã học ✓' : item.meaning.join(' · ')}</small>
         </button></li>)}
       </ul></details>
@@ -272,11 +275,12 @@ export function LearningApp() {
         // Chỉ đổi phiên khi đã chấm thẻ; đồng bộ revision/mẹo nhớ không xóa bài đang viết.
         : activity === 'review' && card && character ? <ReviewCard key={`${database?.name}:${card.id}:${card.fsrsState.reps}`} card={card} character={character} />
         : activity === 'review' && card ? <section className="panel error">Chữ {card.targetId} chưa có trong từ điển phiên bản này.</section>
-        : activity === 'review' ? <section className="panel"><h2>Đã ôn xong các thẻ đến hạn trong lựa chọn.</h2><p><a href="/courses/">Chọn bộ học khác →</a></p><button onClick={() => setActivity('learn')}>Tiếp tục học chữ mới →</button></section>
-        : next && introducedToday < local.settings.newPerDay ? <CharacterLesson key={`${database?.name}:${next.id}`} character={next}
+        : activity === 'review' ? <section className="panel"><h2>Đã ôn xong các thẻ đến hạn trong lựa chọn.</h2>{local.reviews.length > 0 && <p className="cheer">{cheer('reviewed', `${dayKey(now)}:${local.reviews.length}`)}</p>}<p><a href="/courses/">Chọn bộ học khác →</a></p><button onClick={() => setActivity('learn')}>Tiếp tục học chữ mới →</button></section>
+        : next && introducedToday < local.settings.newPerDay ? <>{learnedCheer && <p className="cheer" role="status">{learnedCheer}</p>}<CharacterLesson key={`${database?.name}:${next.id}`} character={next}
           characters={content.characters} words={lessonWords} contentVersion={textbookLesson ? `${content.version}:${textbookLesson.id}` : content.version} peers={deck.length > 1 ? deck : content.characters.slice(0, 24)}
-          preferLessonWords={!!textbookLesson} onPracticeStart={() => setPreview(false)} onSaved={showLesson} />
+          preferLessonWords={!!textbookLesson} onPracticeStart={() => setPreview(false)} onSaved={() => { setLearnedCheer(cheer('learned', Date.now())); showLesson(); }} /></>
         : <section className="panel"><h2>{introducedToday >= local.settings.newPerDay ? 'Đã đạt mục tiêu chữ mới hôm nay.' : 'Đã học hết chữ trong bộ đã chọn.'}</h2>
+          {introducedToday >= local.settings.newPerDay && <p className="cheer">{cheer('goal', dayKey(now))}</p>}
           <p>{introducedToday >= local.settings.newPerDay ? 'Ngày mai sẽ có bộ gợi ý mới. Bạn có thể điều chỉnh số chữ mỗi ngày trong Cài đặt.' : 'Bạn có thể chọn bộ hoặc chủ đề khác để học tiếp.'}</p>
           {scopedDue.length > 0 && <button onClick={() => setActivity('review')}>Ôn {scopedDue.length} thẻ đến hạn →</button>}
           <p className="muted">{local.cards.filter(item => item.fsrsState.state !== State.New).sort((a,b) => a.fsrsState.due.getTime() - b.fsrsState.due.getTime())[0]?.fsrsState.due.toLocaleString('vi-VN')}</p>
@@ -289,7 +293,7 @@ export function LearningApp() {
       <section className="panel tip"><span className="eyebrow">NHỚ LÂU HƠN</span><h2>Thử nhớ trước khi xem.</h2>
         <p>Đọc thành tiếng, gắn chữ với một từ quen thuộc và ôn lại khi đến hạn.</p><small>3–5 chữ mỗi ngày là một nhịp khởi đầu nhẹ nhàng.</small></section><AccountPanel />
     </aside></div>
-    <footer>Hán ngữ · Tiến độ được lưu trên thiết bị. <a href="/browse/">Khám phá từ điển →</a></footer>
+    <footer>{APP_NAME} · Tiến độ được lưu trên thiết bị. <a href="/browse/">Khám phá từ điển →</a></footer>
     <MobileNavigation current={tab === 'settings' ? 'settings' : 'study'} onStudyAction={() => selectTab('study')}
       onSettingsAction={() => selectTab('settings')} />
   </main>;

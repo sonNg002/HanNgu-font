@@ -1,4 +1,4 @@
-import { CARD_TYPES, type CardType, type LearnedCharacter, type ReviewLog, type StudyCard } from './types';
+import { CARD_TYPES, isActiveCardType, type CardType, type LearnedCharacter, type ReviewLog, type StudyCard } from './types';
 import { dayKey, startOfDay } from './time';
 
 const HOUR = 3_600_000;
@@ -54,7 +54,8 @@ export function summarizeProgress({ cards, reviews, learned, now = new Date(), a
     lastSeen.set(review.cardId, at);
     if (previous === undefined || at - previous < MIN_RECALL_GAP_MS || at < windowStart || at > now.getTime()) continue;
     const recalled = review.rating > 1 ? 1 : 0;
-    for (const target of [retention, byInterval[bucket(at - previous)], bySkill[review.type]]) { target.total++; target.recalled += recalled; }
+    // Lượt ôn Hán Việt cũ vẫn tính vào tỷ lệ chung nhưng không còn dòng kỹ năng riêng.
+    for (const target of [retention, byInterval[bucket(at - previous)], ...(isActiveCardType(review.type) ? [bySkill[review.type]] : [])]) { target.total++; target.recalled += recalled; }
     const entry = hard.get(review.targetId) ?? { id: review.targetId, forgotten: 0, reviews: 0 };
     entry.reviews++; entry.forgotten += 1 - recalled;
     hard.set(review.targetId, entry);
@@ -83,12 +84,13 @@ export function summarizeProgress({ cards, reviews, learned, now = new Date(), a
   // Thẻ quá hạn được tính vào hôm nay vì học viên cần ôn chúng ngay.
   const forecast = Array.from({ length: forecastDays }, (_, index) => ({ day: addDays(today, index), cards: 0 }));
   for (const card of cards) {
+    if (!isActiveCardType(card.type)) continue;
     const offset = Math.max(0, Math.round((startOfDay(card.fsrsState.due).getTime() - today.getTime()) / DAY));
     if (offset < forecastDays) forecast[offset].cards++;
   }
 
   const skills = new Map<string, StudyCard[]>();
-  for (const card of cards) skills.set(card.targetId, [...skills.get(card.targetId) ?? [], card]);
+  for (const card of cards.filter(entry => isActiveCardType(entry.type))) skills.set(card.targetId, [...skills.get(card.targetId) ?? [], card]);
   const mature = learned.filter(entry => {
     const owned = skills.get(entry.id) ?? [];
     return owned.length === CARD_TYPES.length && owned.every(card => card.fsrsState.stability >= MATURE_STABILITY_DAYS);

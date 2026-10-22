@@ -7,6 +7,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { loadContent } from '@/lib/content';
 import { INTERVAL_LABELS, MATURE_STABILITY_DAYS, RETENTION_WINDOW_DAYS, niceMax, rate, summarizeProgress, type IntervalBucket, type Retention } from '@/lib/progress';
 import { dayKey } from '@/lib/time';
+import { APP_NAME, cheer } from '@/lib/personal';
 import { CARD_TYPES, TYPE_LABELS, type Character } from '@/lib/types';
 import { MobileNavigation } from './mobile-navigation';
 import { useStudy } from './study-provider';
@@ -86,13 +87,14 @@ export function ProgressDashboard() {
     {!authReady || !summary ? <section className="panel" role="status">Đang tính tiến độ…</section>
       : !summary.learned ? <section className="panel"><h2>Chưa có dữ liệu học.</h2><p>Học chữ đầu tiên để bắt đầu theo dõi chuỗi ngày học và tỷ lệ nhớ.</p><a href="/">Học chữ mới →</a></section>
       : <>
+        {summary.streak.current >= 2 && <p className="cheer">{cheer('streak', dayKey(now), summary.streak.current)}</p>}
         <div className="stats progress-stats">
           <div><span>Chuỗi ngày học</span><strong>{summary.streak.current}<small> ngày</small></strong><small className="muted">
             {summary.streak.activeToday ? `Dài nhất ${summary.streak.longest} ngày` : summary.streak.current ? 'Học hôm nay để giữ chuỗi' : `Dài nhất ${summary.streak.longest} ngày`}</small></div>
           <div><span>Tỷ lệ nhớ {RETENTION_WINDOW_DAYS} ngày</span><strong>{overall === undefined ? '—' : percent(overall)}</strong><small className="muted">
             {summary.retention.total ? `${summary.retention.total} lượt ôn` : 'Chưa có lượt ôn lại'}</small></div>
           <div><span>Chữ đã học</span><strong>{summary.learned}<small> chữ</small></strong></div>
-          <div><span>Chữ đã vững</span><strong>{summary.mature}<small> chữ</small></strong><small className="muted">Ổn định từ {MATURE_STABILITY_DAYS} ngày, đủ 3 kỹ năng</small></div>
+          <div><span>Chữ đã vững</span><strong>{summary.mature}<small> chữ</small></strong><small className="muted">Ổn định từ {MATURE_STABILITY_DAYS} ngày, đủ {CARD_TYPES.length} kỹ năng</small></div>
         </div>
         <div className="progress-layout">
           <section className="panel"><span className="eyebrow">TRÍ NHỚ DÀI HẠN</span><h2>Tỷ lệ nhớ theo khoảng cách ôn</h2>
@@ -123,13 +125,13 @@ export function ProgressDashboard() {
           {summary.hard.length ? <><ul className="hard-characters">{summary.hard.map(entry => {
             const character = characters.get(entry.id);
             return <li key={entry.id}><span className="daily-glyph">{entry.id}</span>
-              <span>{character?.hanViet.join(' / ') || entry.id}<small>{character?.meaning.join(' · ')}</small></span>
+              <span>{character?.pinyin.join(' / ') || entry.id}<small>{character?.meaning.join(' · ')}</small></span>
               <strong>Quên {entry.forgotten}/{entry.reviews} lượt</strong></li>;
           })}</ul><p className="muted">Thử viết một mẹo nhớ mới cho các chữ này trong <a href="/?view=settings">Nhịp học</a>.</p></>
             : <p className="muted">Chưa có chữ nào bị quên từ hai lần trở lên trong {RETENTION_WINDOW_DAYS} ngày.</p>}
         </section>
       </>}
-    <footer>Hán ngữ · Thống kê tính từ tiến độ trên thiết bị. <a href="/">Tiếp tục học →</a></footer>
+    <footer>{APP_NAME} · Thống kê tính từ tiến độ trên thiết bị. <a href="/">Tiếp tục học →</a></footer>
     <MobileNavigation current="progress" />
   </main>;
 }

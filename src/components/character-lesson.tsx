@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, type FormEvent } from 'react';
-import { contextChoices, lessonExample, matchesHanViet, matchesPinyin } from '@/lib/lesson';
+import { contextChoices, lessonExample, matchesPinyin } from '@/lib/lesson';
 import { restoreLessonDraft, saveLessonDraft } from '@/lib/lesson-draft';
 import { introduceCharacter } from '@/lib/study';
 import type { Character, Word } from '@/lib/types';
@@ -45,10 +45,9 @@ function Pronunciation({ text }: { text: string }) {
 function CharacterExplanation({ character, characters, mnemonic }: { character: Character; characters: Character[]; mnemonic: string }) {
   return <div className="character-explanation">
     <div className="lesson-identity"><div className="hanzi">{character.id}</div><div>
-      <h2>{character.meaning.join(' · ')}</h2><p><strong>{character.pinyin.join(' / ')}</strong> · Hán Việt: {character.hanViet.join(' / ')}</p>
+      <h2>{character.meaning.join(' · ')}</h2><p><strong>{character.pinyin.join(' / ')}</strong></p>
       <Pronunciation text={character.id} />
     </div></div>
-    {character.readingSource === 'unihan' && <small className="muted">Âm Việt theo kho Unihan; có thể gồm cách đọc Hán Nôm.</small>}
     {character.meaningLanguage === 'en' && <p className="muted">Nghĩa của chữ này hiện dùng tiếng Anh trong từ điển.</p>}
     {character.meaningTranslation === 'machine' && <p className="muted">Nghĩa tiếng Việt được dịch máy; hãy đối chiếu ngữ cảnh khi học.</p>}
     <div className="lesson-association">
@@ -72,8 +71,7 @@ export function CharacterLesson({ character, characters, words, peers, contentVe
   const [step, setStep] = useState<0 | 1 | 2 | 3>(0);
   const [mnemonic, setMnemonic] = useState(character.mnemonic);
   const [pinyin, setPinyin] = useState('');
-  const [hanViet, setHanViet] = useState('');
-  const [recallErrors, setRecallErrors] = useState({ pinyin: '', hanViet: '' });
+  const [recallError, setRecallError] = useState('');
   const [recalled, setRecalled] = useState(false);
   const [writing, setWriting] = useState<WritingResult | null>(null);
   const [applied, setApplied] = useState(false);
@@ -94,9 +92,9 @@ export function CharacterLesson({ character, characters, words, peers, contentVe
       if (!active) return;
       const draft = restoreLessonDraft(character, stored, contentVersion);
       if (draft) {
-        setStep(draft.step); setMnemonic(draft.mnemonic); setPinyin(draft.pinyin); setHanViet(draft.hanViet);
+        setStep(draft.step); setMnemonic(draft.mnemonic); setPinyin(draft.pinyin);
         setWriting(draft.writing ?? null); setApplied(draft.applied);
-        setRecalled(matchesPinyin(draft.pinyin, character.pinyin) && matchesHanViet(draft.hanViet, character.hanViet));
+        setRecalled(matchesPinyin(draft.pinyin, character.pinyin));
         setResumed(draft.step > 0);
       }
       setDraftReady(true);
@@ -108,12 +106,12 @@ export function CharacterLesson({ character, characters, words, peers, contentVe
     if (!database || !draftReady) return;
     let active = true;
     void saveLessonDraft(database, {
-      id: character.id, contentVersion, updatedAt: Date.now(), step, mnemonic, pinyin, hanViet,
+      id: character.id, contentVersion, updatedAt: Date.now(), step, mnemonic, pinyin,
       ...(writing ? { writing } : {}), applied,
     }).then(saved => { if (active && saved) setDraftStatus('Bài dở đã lưu trên thiết bị'); })
       .catch(() => { if (active) setDraftStatus('Chưa lưu được bài dở. Hãy giữ trang mở cho đến khi lưu bài.'); });
     return () => { active = false; };
-  }, [database, draftReady, character.id, contentVersion, step, mnemonic, pinyin, hanViet, writing, applied]);
+  }, [database, draftReady, character.id, contentVersion, step, mnemonic, pinyin, writing, applied]);
 
   useEffect(() => {
     if (!draftReady || step === 0) return;
@@ -125,13 +123,9 @@ export function CharacterLesson({ character, characters, words, peers, contentVe
   function checkRecall(event: FormEvent) {
     event.preventDefault();
     const pinyinCorrect = matchesPinyin(pinyin, character.pinyin);
-    const hanVietCorrect = matchesHanViet(hanViet, character.hanViet);
-    setRecallErrors({
-      pinyin: pinyinCorrect ? '' : 'Chưa đúng Pinyin hoặc thanh điệu. Xem lại rồi thử một lần nữa.',
-      hanViet: hanVietCorrect ? '' : 'Chưa khớp âm Hán Việt trong bộ học. Kiểm tra cả dấu tiếng Việt.',
-    });
-    if (pinyinCorrect && hanVietCorrect) {
-      onPracticeStart(); setRecalled(true); setStep(2); setFeedback('Bạn đã nhớ đúng cả hai cách đọc. Tiếp theo hãy nhớ hình và viết chữ.');
+    setRecallError(pinyinCorrect ? '' : 'Chưa đúng Pinyin hoặc thanh điệu. Xem lại rồi thử một lần nữa.');
+    if (pinyinCorrect) {
+      onPracticeStart(); setRecalled(true); setStep(2); setFeedback('Bạn đã nhớ đúng cách đọc. Tiếp theo hãy nhớ hình và viết chữ.');
     }
   }
   function apply(id: string) {
@@ -166,7 +160,7 @@ export function CharacterLesson({ character, characters, words, peers, contentVe
       <details><summary>Viết câu chuyện nhớ chữ của riêng bạn</summary>
         <label>Mẹo nhớ<textarea maxLength={2000} value={mnemonic} onChange={event => setMnemonic(event.target.value)} /></label>
       </details>
-      <p className="muted">Nhìn chữ, đọc Pinyin và âm Hán Việt thành tiếng. Sau đó thử gọi lại cách đọc khi đáp án đã ẩn.</p>
+      <p className="muted">Nhìn chữ và đọc Pinyin thành tiếng. Sau đó thử gọi lại cách đọc khi đáp án đã ẩn.</p>
       <button onClick={() => { onPracticeStart(); setStep(1); setFeedback(''); }}>Ẩn đáp án và thử nhớ →</button>
     </>}
 
@@ -175,11 +169,8 @@ export function CharacterLesson({ character, characters, words, peers, contentVe
       <p className="muted">Thử nhớ trước khi mở lại bài. Bạn có thể nhập Pinyin có dấu hoặc số thanh.</p>
       <form onSubmit={checkRecall}>
         <label>Pinyin<input required autoComplete="off" autoCapitalize="none" spellCheck={false} value={pinyin} onChange={event => setPinyin(event.target.value)}
-          placeholder="Nhập Pinyin có dấu hoặc số thanh" aria-invalid={!!recallErrors.pinyin} aria-describedby="pinyin-error" /></label>
-        <p id="pinyin-error" className="error" role="status">{recallErrors.pinyin}</p>
-        <label>Âm Hán Việt<input required autoComplete="off" value={hanViet} onChange={event => setHanViet(event.target.value)}
-          placeholder="Nhập âm Hán Việt có dấu" aria-invalid={!!recallErrors.hanViet} aria-describedby="hanviet-error" /></label>
-        <p id="hanviet-error" className="error" role="status">{recallErrors.hanViet}</p>
+          placeholder="Nhập Pinyin có dấu hoặc số thanh" aria-invalid={!!recallError} aria-describedby="pinyin-error" /></label>
+        <p id="pinyin-error" className="error" role="status">{recallError}</p>
         <button>Kiểm tra và luyện viết →</button>
       </form>
       <details className="lesson-help"><summary>Chưa nhớ? Xem lại và nghe cách đọc</summary>
@@ -188,7 +179,7 @@ export function CharacterLesson({ character, characters, words, peers, contentVe
     </>}
 
     {step === 2 && <>
-      <h2>Nhớ hình và tự viết</h2><p>{character.meaning.join(' · ')} · {character.hanViet.join(' / ')}</p>
+      <h2>Nhớ hình và tự viết</h2><p>{character.meaning.join(' · ')} · {character.pinyin.join(' / ')}</p>
       <p className="success" role="status">{feedback}</p>
       {/* Giữ quy trình tô mẫu rồi tự viết; chỉ kết quả tự viết được dùng để lưu và lên lịch ôn. */}
       <WritingPractice character={character.id} onResult={setWriting} disabled={busy} />

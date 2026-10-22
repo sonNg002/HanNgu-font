@@ -255,3 +255,5 @@ button{border-radius:var(--radius-control)}.panel{border-radius:var(--radius-pan
 @media(max-width:760px){.mobile-navigation{grid-template-columns:repeat(5,minmax(0,1fr))}.mobile-navigation a,.mobile-navigation button{min-width:0;padding-inline:2px}}
 @media(max-width:540px){.course-grid{grid-template-columns:1fr}}
 .hsk-word-list{list-style:none;padding:0}.hsk-word-list li{display:flex;gap:18px;padding:12px 0;border-bottom:1px solid var(--line)}.hsk-word-list strong{font-size:25px;min-width:70px;overflow-wrap:anywhere}.hsk-word-list span{min-width:0;overflow-wrap:anywhere}.hsk-word-list small{display:block;color:var(--muted)}.hsk-recall{padding:20px;border:1px solid var(--line);border-radius:12px;background:var(--paper)}.hsk-grammar{border-top:1px solid var(--line);padding:12px 0}.hsk-lesson-study{margin:16px 0}.hsk-lesson-study .button-link{margin:10px 0}.textbook-lessons .panel{scroll-margin-top:24px}
+/* Lời nhắn riêng cho Ly: tông ấm, nổi nhẹ trên nền học mà không lấn nút hành động. */
+.cheer{margin:0 0 14px;padding:12px 16px;border:1px solid #efdfc3;border-radius:12px;background:var(--warm-soft);color:var(--warm);font-weight:600}

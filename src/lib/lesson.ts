@@ -38,17 +38,6 @@ export function matchesPinyin(answer: string, readings: string[]): boolean {
   return !key.includes('!invalid') && readings.some(reading => pinyinKey(reading) === key);
 }
 
-export function matchesHanViet(answer: string, readings: string[]): boolean {
-  // Giữ thanh và dạng nguyên âm, nhưng chấp nhận hai cách đặt dấu như thủy/thuỷ và hòa/hoà.
-  // Tách thanh khỏi vị trí nguyên âm để không bắt học viên sửa một biến thể chính tả hợp lệ.
-  const key = (value: string) => value.toLocaleLowerCase('vi-VN').trim().split(/\s+/).map(syllable => {
-    let tones = '';
-    const base = syllable.normalize('NFD').replace(/[\u0300\u0301\u0303\u0309\u0323]/g, mark => { tones += mark; return ''; });
-    return `${base}|${tones}`;
-  }).join(' ');
-  return !!key(answer) && readings.some(reading => key(reading) === key(answer));
-}
-
 export function lessonExample(character: Character, words: Word[], preferLessonWords = false): Example | undefined {
   // Chỉ tạo câu hỏi từ ví dụ/từ có thật trong kho; không ghép tùy ý thành từ mới.
   const example = character.examples.find(entry => entry.text.includes(character.id) && entry.translation.trim());

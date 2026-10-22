@@ -33,7 +33,7 @@ export function DictionaryBrowser({ characters }: { characters: Character[] }) {
   // Phân trang để hàng nghìn chữ không tạo hàng nghìn card/SVG cùng lúc trên điện thoại.
   return <>
     <section className="panel catalog-controls">
-      <label>Tìm chữ, pinyin, âm Việt hoặc nghĩa<input type="search" value={query} placeholder="Ví dụ: 明, ming, minh…" maxLength={200} onChange={event => update({ query: event.target.value })} /></label>
+      <label>Tìm chữ, pinyin hoặc nghĩa<input type="search" value={query} placeholder="Ví dụ: 明, ming, sáng…" maxLength={200} onChange={event => update({ query: event.target.value })} /></label>
       <label>Chia theo bộ thủ<select value={radical} onChange={event => update({ radical: event.target.value })}>
         <option value="">Tất cả {characters.length.toLocaleString('vi-VN')} chữ</option>
         {groups.map(group => <option key={group.id} value={group.id}>{group.glyph} {group.name} {group.variants.join('/')} · {group.count} chữ</option>)}
@@ -56,17 +56,16 @@ export function DictionaryBrowser({ characters }: { characters: Character[] }) {
     {!filtered.length && <section className="panel"><h2>Chưa tìm thấy chữ phù hợp.</h2><p>Thử một từ ngắn hơn, bỏ dấu hoặc mở rộng cấp HSK và bộ thủ.</p><button onClick={() => update(DEFAULT_CATALOG_VIEW)}>Xem toàn bộ từ điển</button></section>}
     <h2 ref={resultsHeading} tabIndex={-1} className="catalog-results-heading">{filtered.length ? `Kết quả ${currentPage * PAGE_SIZE + 1}–${Math.min((currentPage + 1) * PAGE_SIZE, filtered.length)} / ${filtered.length.toLocaleString('vi-VN')} chữ` : 'Kết quả tìm kiếm'}</h2>
     <div className="dictionary">{filtered.slice(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE).map(character => <article className="panel" key={character.id}>
-      <div className="hanzi small">{character.id}</div><h2>{character.hanViet.join(' / ') || 'Chưa có âm Việt'}</h2>
-      <p>{character.pinyin.join(' / ')}</p><p>{character.meaning.join(' · ')} {character.meaningLanguage === 'en' && <small className="muted">(nghĩa tiếng Anh)</small>}</p>
+      <div className="hanzi small">{character.id}</div><h2>{character.pinyin.join(' / ')}</h2>
+      <p>{character.meaning.join(' · ')} {character.meaningLanguage === 'en' && <small className="muted">(nghĩa tiếng Anh)</small>}</p>
       {character.meaningTranslation === 'machine' && <small className="muted">Nghĩa tiếng Việt · bản dịch máy</small>}
       <p className="muted">Bộ {character.radical}{character.radicalVariant && character.radicalVariant !== character.radical ? ` (${character.radicalVariant})` : ''} · {character.strokes} nét{character.hsk ? ` · HSK ${character.hsk}` : ''}</p>
       <p className="muted">Thành phần: {character.components.join(' + ') || 'Chữ đơn'}</p>
-      {character.readingSource === 'unihan' && <small className="muted">Âm Việt theo Unihan</small>}
       <div className="actions"><button className="secondary" onClick={() => { setPractice(character); window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' }); }}>Luyện viết</button>
         <a href={`/?radical=${character.radicalNumber}&character=${encodeURIComponent(character.id)}`}>Học chữ này →</a></div>
     </article>)}</div>
     <nav className="catalog-pagination" aria-label="Phân trang chữ"><button className="secondary" disabled={currentPage === 0} onClick={() => update({ page: currentPage - 1 }, true)}>← Trang trước</button>
       <span>Trang {currentPage + 1}/{pages}</span><button className="secondary" disabled={currentPage + 1 >= pages} onClick={() => update({ page: currentPage + 1 }, true)}>Trang sau →</button></nav>
-    <p className="muted">Nguồn: Make Me a Hanzi và Unicode Unihan. Âm Việt từ Unihan có thể gồm cách đọc Hán Nôm; nghĩa tiếng Việt đang được bổ sung. <a href="/data/licenses/makemeahanzi-LICENSE.txt">Giấy phép dữ liệu</a></p>
+    <p className="muted">Nguồn: Make Me a Hanzi và Unicode Unihan; nghĩa tiếng Việt đang được bổ sung. <a href="/data/licenses/makemeahanzi-LICENSE.txt">Giấy phép dữ liệu</a></p>
   </>;
 }

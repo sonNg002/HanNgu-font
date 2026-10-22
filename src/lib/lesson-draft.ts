@@ -1,5 +1,5 @@
 import type { StudyDatabase } from './db';
-import { matchesHanViet, matchesPinyin } from './lesson';
+import { matchesPinyin } from './lesson';
 import type { Character, LessonDraft } from './types';
 import { validateWriting } from './writing';
 
@@ -7,8 +7,9 @@ export function restoreLessonDraft(character: Character, draft: LessonDraft | un
   if (!draft || draft.id !== character.id || draft.contentVersion !== contentVersion
     || !Number.isInteger(draft.step) || draft.step < 0 || draft.step > 3
     || typeof draft.mnemonic !== 'string' || draft.mnemonic.length > 2000
-    || typeof draft.pinyin !== 'string' || typeof draft.hanViet !== 'string') return undefined;
-  const recalled = matchesPinyin(draft.pinyin, character.pinyin) && matchesHanViet(draft.hanViet, character.hanViet);
+    || typeof draft.pinyin !== 'string') return undefined;
+  // Bài dở cũ có thêm âm Hán Việt vẫn mở được; chỉ Pinyin quyết định đã nhớ âm.
+  const recalled = matchesPinyin(draft.pinyin, character.pinyin);
   let writing = draft.writing;
   if (writing) {
     try {

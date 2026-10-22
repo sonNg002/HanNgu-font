@@ -30,9 +30,12 @@ export interface SyncMeta { id: string; value: number }
 // Bài dở thuộc kho riêng trên thiết bị, không phải thẻ đã học hoặc dữ liệu đồng bộ.
 export interface LessonDraft {
   id: string; contentVersion: string; updatedAt: number; step: 0 | 1 | 2 | 3;
-  mnemonic: string; pinyin: string; hanViet: string; writing?: WritingResult; applied: boolean;
+  // hanViet chỉ còn ở bài dở cũ; bài học không hỏi âm Hán Việt nữa.
+  mnemonic: string; pinyin: string; hanViet?: string; writing?: WritingResult; applied: boolean;
 }
-export const CARD_TYPES: CardType[] = ['recognize', 'write', 'recall-hv'];
+// 'recall-hv' giữ trong CardType để đọc và đồng bộ thẻ cũ, nhưng không tạo hoặc ôn nữa.
+export const CARD_TYPES: CardType[] = ['recognize', 'write'];
+export const isActiveCardType = (type: CardType) => CARD_TYPES.includes(type);
 export const TYPE_LABELS: Record<CardType, string> = {
   recognize: 'Nhận mặt chữ', write: 'Tập viết', 'recall-hv': 'Nhớ Hán Việt',
 };

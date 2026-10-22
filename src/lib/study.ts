@@ -1,7 +1,7 @@
 import { validateWriting, type WritingAssessment, type WritingResult } from './writing';
 import { createEmptyCard, fsrs, type Grade } from 'ts-fsrs';
 import { db, DEFAULT_SETTINGS, type StudyDatabase } from './db';
-import { CARD_TYPES, type Character, type RatingValue, type Settings, type StudyCard } from './types';
+import { CARD_TYPES, isActiveCardType, type Character, type RatingValue, type Settings, type StudyCard } from './types';
 import { startOfDay } from './time';
 import { changed } from './sync-state';
 
@@ -12,7 +12,7 @@ export function orderedCharacters(characters: Character[], order: Settings['orde
     (order === 'hsk' ? (a.hsk ?? 99) - (b.hsk ?? 99) : 0) || a.freq - b.freq || a.id.localeCompare(b.id));
 }
 export function dueCards(cards: StudyCard[], now = new Date()): StudyCard[] {
-  return cards.filter(card => card.fsrsState.due.getTime() <= now.getTime()).sort((a, b) =>
+  return cards.filter(card => isActiveCardType(card.type) && card.fsrsState.due.getTime() <= now.getTime()).sort((a, b) =>
     Number(a.fsrsState.reps === 0) - Number(b.fsrsState.reps === 0) ||
     a.fsrsState.due.getTime() - b.fsrsState.due.getTime() || a.id.localeCompare(b.id));
 }
@@ -29,7 +29,7 @@ export async function introduceCharacter(character: Character, mnemonic: string,
     if (writing.character !== character.id || writing.strokeCount !== character.strokes
       || !Number.isFinite(writing.durationMs) || writing.durationMs < 0) throw new Error('Kết quả không khớp chữ đang học.');
   }
-  // Một transaction kiểm hạn mức và tạo đủ ba kỹ năng, kể cả khi hai tab cùng thao tác.
+  // Một transaction kiểm hạn mức và tạo đủ các kỹ năng, kể cả khi hai tab cùng thao tác.
   await database.transaction('rw', database.cards, database.learned, database.settings, database.reviews, database.lessonDrafts, async () => {
     if (await database.learned.get(character.id)) throw new Error('Chữ này đã có trong bộ học.');
     const settings = await database.settings.get('main') ?? DEFAULT_SETTINGS;

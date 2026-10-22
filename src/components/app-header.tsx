@@ -1,6 +1,7 @@
 'use client';
 
 import { NAVIGATION, type AppPage } from '@/lib/navigation';
+import { APP_NAME, APP_TAGLINE } from '@/lib/personal';
 import { useStudy } from './study-provider';
 
 export function AppHeader({ current, onStudyAction, onSettingsAction }: {
@@ -17,7 +18,7 @@ export function AppHeader({ current, onStudyAction, onSettingsAction }: {
   return <>
     <a className="skip-link" href="#page-content">Đến nội dung chính</a>
     <header className="topbar">
-      <a href="/" className="brand"><span className="brand-mark">字</span><span>Hán ngữ<small>Hiểu từng chữ. Nhớ lâu hơn.</small></span></a>
+      <a href="/" className="brand"><span className="brand-mark">字</span><span>{APP_NAME}<small>{APP_TAGLINE}</small></span></a>
       {current === 'study' && <a className="mobile-jump" href="#today-plan">Bộ học ↓</a>}
       <nav aria-label="Điều hướng chính">{NAVIGATION.map(item => {
         const action = item.page === 'study' ? onStudyAction : item.page === 'settings' ? onSettingsAction : undefined;
